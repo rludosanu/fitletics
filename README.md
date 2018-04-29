@@ -2,6 +2,55 @@
 
 **fitletics** is a personnal bodyweight training web-app based on the famous Freeletics app.
 
+## Todo
+
+- [ ] Build up pages design
+	- [ ] Signin / Signup
+	- [ ] Index screen
+		- [ ] Pre-defined workouts
+		- [ ] Express sessions
+		- [ ] Exercise sets
+		- [ ] Bottom bar
+	- [ ] Pre-defined workouts
+		- [ ] List of all of the workouts
+		- [ ] Workout (started)
+		- [ ] Workout feedback
+	- [ ] Express sessions
+	- [ ] Profil
+	- [ ] Stat
+- [ ] Define API routes
+- [ ] Create models for database
+	- [ ] User
+	- [ ] Measurements
+	- [ ] Exercises
+	- [ ] Pre-defined workouts
+	- [ ] Express sessions
+
+## Models
+
+- [ ] User
+	- id
+	- email
+	- password
+	- name
+	- birthday
+- [ ] Measurements
+	- id
+	- userId
+	- date
+	- bodyWeight
+	- leftArm
+	- rightArm
+	- leftLeg
+	- rightLeg
+- [ ] Exercises
+	- id
+	- name
+	- type (enum: endurance, standard, force)
+	- category (enum: planks, squats, crunches, situps, pushups, pullups)
+	- points
+	- bodyPart
+
 ## Architecture
 
 - [ ] Signin / Signup
@@ -36,6 +85,7 @@
 - [ ] Express sessions
 	- [ ] How much time ?
 	- [ ] Parts of the body not to use
+	- [ ] Automatic name generator
 	- [ ] Start button
 - [ ] Exercise sets
 	- [ ] Basics
@@ -62,20 +112,3 @@
 		- [ ] Total points
 		- [ ] Total time
 		- [ ] Measurements
-
-## Todo
-
-- [ ] Build up pages design
-	- [ ] Signin / Signup
-	- [ ] Index screen
-		- [ ] Pre-defined workouts
-		- [ ] Express sessions
-		- [ ] Exercise sets
-		- [ ] Bottom bar
-	- [ ] Pre-defined workouts
-		- [ ] List of all of the workouts
-		- [ ] Workout (started)
-		- [ ] Workout feedback
-	- [ ] Express sessions
-	- [ ] Profil
-	- [ ] Stat
