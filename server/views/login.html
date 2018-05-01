@@ -12,13 +12,15 @@
 				<div id="page-logo">
 					<span class="fa fa-fw fa-circle-o-notch"></span>
 				</div>
-				<div id="page-ids">
-					<input type="email" name="email" placeholder="EMAIL" />
-					<input type="password" name="password" placeholder="PASSWORD" />
-				</div>
-				<div id="page-login">
-					<input type="button" name="login" value="LOGIN" />
-				</div>
+				<form action="/api/user/login" method="post">
+					<div id="page-ids">
+						<input type="email" name="email" placeholder="EMAIL" />
+						<input type="password" name="password" placeholder="PASSWORD" />
+					</div>
+					<div id="page-login">
+						<input type="submit" name="login" value="LOGIN" />
+					</div>
+				</form>
 				<div id="page-register">
 					Don't have an account ? <a href="/register">Register here</a>
 				</div>
