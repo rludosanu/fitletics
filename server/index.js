@@ -12,12 +12,12 @@ app.get('/', function (req, res) {
 	res.render('login.html');
 });
 
-app.get('/forgot', function (req, res) {
-	res.render('forgot.html');
+app.get('/register', function (req, res) {
+	res.render('register.html');
 });
 
-app.get('/signup', function (req, res) {
-	res.render('signup.html');
+app.get('/activate', function (req, res) {
+	res.render('activate.html');
 });
 
 app.listen(3000, function () {

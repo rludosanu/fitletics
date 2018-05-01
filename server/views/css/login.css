@@ -39,7 +39,8 @@ input, button, textarea {
 	margin-bottom: 10vw;
 }
 
-#page-ids input, #page-login input {
+#page-ids input,
+#page-login input {
 	width: 100%;
 	box-sizing: border-box;
 	border: 4px solid #00bfff;
