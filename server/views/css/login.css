@@ -1,0 +1,76 @@
+body {
+	padding: 0;
+	margin: 0;
+	background: #3B3131;
+	font-family: 'Open Sans', sans-serif;
+}
+
+input, button, textarea {
+	font-family: 'Open Sans', sans-serif;
+}
+
+#page {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#page-content {
+	padding: 10vw;
+}
+
+#page-logo {
+	text-align: center;
+	color: #00bfff;
+	font-size: 25vw;
+	margin-bottom: 25vw;
+}
+
+#page-ids {
+	margin-bottom: 6vw;
+}
+
+#page-login {
+	margin-bottom: 10vw;
+}
+
+#page-ids input, #page-login input {
+	width: 100%;
+	box-sizing: border-box;
+	border: 4px solid #00bfff;
+	border-radius: 999px;
+	font-size: 3vw;
+	background: none;
+	padding: 4.5vw;
+	color: white;
+	outline:none;
+}
+
+#page-ids input::placeholder,
+#page-login input::placeholder {
+	color: white;
+}
+
+#page-ids input {
+	margin-bottom: 3vw;
+}
+
+#page-login input {
+	background: #00bfff;
+}
+
+#page-register {
+	font-size: 3vw;
+	color: white;
+	text-align: center;
+}
+
+#page-register a {
+	color: #00bfff;
+	text-decoration: none;
+}
