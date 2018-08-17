@@ -2,12 +2,12 @@ const Sequelize = require('sequelize');
 
 module.exports = {
   server: {
-    host: '',
-    port: 
+    host: '127.0.0.1',
+    port: 3000
   },
   database: {
     host: '',
-    port: ,
+    port: 0000,
     dialect: '',
     operatorsAliases: Sequelize.Op,
     database: '',

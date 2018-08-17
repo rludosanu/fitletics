@@ -2,13 +2,13 @@ const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const https = require('https');
+const http = require('http');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
 
 const Config = require('./config/index');
-const Database = require('./database/index');
-const Models = require('./models/index');
+// const Database = require('./database/index');
+// const Models = require('./models/index');
 const Controllers = require('./controllers/index');
 const Routers = require('./routers/index');
 
@@ -17,8 +17,8 @@ class Server {
 		/* Confirguration file */
 		this.config = config;
 
-		this.database = new Database(this);
-		this.models = new Models(this);
+		// this.database = new Database(this);
+		// this.models = new Models(this);
 		this.controllers = new Controllers(this);
 		this.routers = new Routers(this);
 
@@ -51,7 +51,7 @@ class Server {
 
 	start() {
 		/* Connect to database */
-		this.database.connect();
+		// this.database.connect();
 
 		/* Run server */
 		this.server.listen(this.config.server.port, (error) => {

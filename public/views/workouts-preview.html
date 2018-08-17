@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{{=[[ ]]=}}
+<html ng-app="my-app">
+	<head>
+		<title>MyApp Home</title>
+
+    <meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+
+		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
+		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+	</head>
+  <body ng-controller="workoutPreview">
+    <header id="header">
+      <div class="layer">
+				<a href="/">
+        	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;{{ workout.name }}
+				</a>
+      </div>
+    </header>
+
+    <div id="list-container">
+      <div id="workout-preview">
+        <div class="layer" ng-repeat="set in workout.sets">
+					<div class="layer-title">Serie n/m</div>
+					<div class="layer-content" ng-repeat="exercice in set">
+						<div class="layer-thumbnail">
+							<img src="{{ exercice.thumbnail }}" />
+						</div>
+						<div class="layer-infos">
+							<div class="repetition">{{ exercice.repetition }}x {{ exercice.name }}</div>
+						</div>
+					</div>
+        </div>
+      </div>
+    </div>
+
+		<script src="/public/controllers/workout.js"></script>
+	</body>
+</html>
