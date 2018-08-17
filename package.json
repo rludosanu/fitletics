@@ -1,0 +1,28 @@
+{
+  "name": "talkrtc-client",
+  "version": "1.0.0",
+  "description": "TalkRTC client",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Razvan Ludosanu",
+  "license": "ISC",
+  "devDependencies": {
+    "morgan": "^1.9.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "joi": "^13.5.2",
+    "mustache-express": "^1.2.7",
+    "mysql2": "^1.6.1",
+    "nodemailer": "^4.6.7",
+    "pg": "^7.4.3",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.38.0",
+    "socket.io-client": "^2.1.1"
+  }
+}

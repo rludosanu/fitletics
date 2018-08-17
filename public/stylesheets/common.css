@@ -1,0 +1,14 @@
+/*
+** Global
+*/
+
+body {
+  margin: 0px;
+  padding: 0px;
+  background: white;
+  font-family: 'Quicksand';
+}
+
+a {
+  text-decoration: none;
+}
