@@ -14,23 +14,42 @@
 		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
   <body ng-controller="workoutPreview">
     <header id="header">
       <div class="layer">
-				<a href="/">
+				<a href="/workout">
         	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;{{ workout.name }}
 				</a>
       </div>
     </header>
 
-    <div id="list-container">
-      <div id="workout-preview">
+    <div id="preview-container">
+			<div id="workout-preview-header">
+				<div class="content">
+					<table>
+						<tr>
+							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Equipment</td>
+							<td>{{ workout.equipment }}</td>
+						</tr>
+						<tr>
+							<td><span class="fa fa-fw fa-clock-o"></span>&nbsp;Avg. Duration</td>
+							<td>{{ workout.duration }}</td>
+						</tr>
+						<tr>
+							<td><span class="fa fa-fw fa-star"></span>&nbsp;Personal Best</td>
+							<td>43:51</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+      <div id="workout-preview-body">
         <div class="layer" ng-repeat="set in workout.sets">
-					<div class="layer-title">Serie n/m</div>
+					<div class="layer-title">Serie {{ $index + 1 }}</div>
 					<div class="layer-content" ng-repeat="exercice in set">
 						<div class="layer-thumbnail">
-							<img src="{{ exercice.thumbnail }}" />
+							<img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" />
 						</div>
 						<div class="layer-infos">
 							<div class="repetition">{{ exercice.repetition }}x {{ exercice.name }}</div>
@@ -39,6 +58,12 @@
         </div>
       </div>
     </div>
+
+		<footer id="footer" class="bg-blue">
+			<a href="/workout/{{ workout.name.toLowerCase() }}/live">
+				Start
+			</a>
+		</footer>
 
 		<script src="/public/controllers/workout.js"></script>
 	</body>

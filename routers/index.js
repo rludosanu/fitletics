@@ -11,10 +11,18 @@ class ClientRouter {
 
     /* Set up routing */
     this.router.get('/', (req, res) => res.render('index'));
-    this.router.get('/workouts', (req, res) => res.render('workouts'));
-    this.router.get('/workouts/:id', (req, res) => res.render('workouts-preview'));
-    this.router.get('/404', (req, res) => res.render('404'));
-    this.router.get('/*', (req, res) => res.redirect('/404'));
+
+    this.router.get('/workout', (req, res) => res.render('workout'));
+
+    this.router.get('/workout/:id/preview', (req, res) => res.render('workout-preview'));
+
+    this.router.get('/workout/:id/live', (req, res) => res.render('workout-live'));
+
+    this.router.get('/exercise', (req, res) => res.render('exercise'));
+
+    // this.router.get('/404', (req, res) => res.render('404'));
+
+    // this.router.get('/*', (req, res) => res.redirect('/404'));
   }
 }
 

@@ -14,8 +14,9 @@
 		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
-  <body>
+  <body ng-controller="workoutList">
     <header id="header">
       <div class="layer">
 				<a href="/">
@@ -25,12 +26,12 @@
     </header>
 
     <div id="list-container">
-      <div id="workouts" ng-controller="workoutList">
+      <div id="workouts">
         <div class="layer" ng-repeat="workout in workouts">
-					<a href="/workouts/1">
+					<a href="/workout/{{ workout.name.toLowerCase() }}/preview">
 	          <div class="layer-content">
 	            <div class="layer-thumbnail">
-	              <img src="{{ workout.thumbnail }}" />
+	              <img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" />
 	            </div>
 	            <div class="layer-infos">
 	              <div class="name">{{ workout.name }}</div>

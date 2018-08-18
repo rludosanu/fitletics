@@ -2,14 +2,28 @@
 ** Global
 */
 
+html {
+  background: #151515;
+}
+
 body {
   margin: 0px;
   padding: 0px;
-  background: white;
   font-family: 'Open Sans';
-  background: #151515;
 }
 
 a {
   text-decoration: none;
+}
+
+/*
+**
+*/
+
+.bg-lightbrown {
+  background: #292929;
+}
+
+.bg-blue {
+  background: #3B7FF1;
 }

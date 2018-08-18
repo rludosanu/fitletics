@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{{=[[ ]]=}}
+<html ng-app="my-app">
+	<head>
+		<title>MyApp Home</title>
+
+    <meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+
+		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
+		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
+	</head>
+  <body ng-controller="exerciseList">
+    <header id="header">
+      <div class="layer">
+				<a href="/">
+        	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;Individual Exercises
+				</a>
+      </div>
+    </header>
+
+    <div id="list-container">
+      <div id="workouts">
+        <div class="layer" ng-repeat="exercise in exercises">
+					<a href="/exercise/{{ exercise.name.toLowerCase() }}/preview">
+	          <div class="layer-content">
+	            <div class="layer-thumbnail">
+	              <img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" />
+	            </div>
+	            <div class="layer-infos">
+	              <div class="name">{{ exercise.name }}</div>
+	              <!-- <div class="body">{{ workout.body }}</div>
+	              <div class="duration"><span class="fa fa-fw fa-clock-o"></span>&nbsp;{{ workout.duration }}</div>
+	              <div class="difficulty"><span class="fa fa-fw fa-flash"></span>&nbsp;{{ workout.difficulty }}</div> -->
+	            </div>
+	          </div>
+					</a>
+        </div>
+      </div>
+    </div>
+
+		<script src="/public/controllers/workout.js"></script>
+	</body>
+</html>
