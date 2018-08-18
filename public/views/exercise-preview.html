@@ -16,29 +16,46 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
-  <body ng-controller="exerciseList">
+  <body ng-controller="exercisePreview">
     <header id="header">
       <div class="layer">
-				<a href="/">
-        	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;Individual Exercices
+				<a href="/exercise">
+        	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;{{ exercise.name }}
 				</a>
       </div>
     </header>
 
-    <div style="position: absolute; z-index: 1; top: 60px; left: 0px; width: 100%; height: calc(100% - 60px); overflow: auto;">
-      <div>
-        <div style="padding: 5px;" ng-repeat="exercise in exercises">
-					<a href="/exercise/{{ exercise.name.toLowerCase() }}/preview" style="color: white; text-decoration: none;">
-	          <div style=" display: flex; align-items: center;">
-	            <div style="width: 45px; padding: 5px 10px 5px 5px;">
-	              <img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" style="width: 100%; display: block; border-radius: 6px;" />
-	            </div>
-              <div style="font-size: 15px;">{{ exercise.name }}</div>
-	          </div>
-					</a>
-        </div>
-      </div>
-    </div>
+		<div id="preview-container">
+			<div id="workout-preview-header">
+				<div class="content">
+					<table>
+						<tr>
+							<td><span class="fa fa-fw fa-rub"></span>&nbsp;Points</td>
+							<td>{{ exercise.points }}</td>
+						</tr>
+						<tr>
+							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Difficulty</td>
+							<td>{{ exercise.difficulty }}</td>
+						</tr>
+						<tr>
+							<td><span class="fa fa-fw fa-dot-circle-o"></span>&nbsp;Body target</td>
+							<td>{{ exercise.body }}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="workout-preview-body">
+			<div class="layer">
+				Hello World !
+			</div>
+		</div>
+
+		<footer id="footer" class="bg-blue">
+			<a href="/exercise/{{ exercise.name.toLowerCase() }}/live">
+				Start
+			</a>
+		</footer>
 
 		<script src="/public/controllers/workout.js"></script>
 	</body>

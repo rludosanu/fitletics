@@ -5,21 +5,39 @@
 		burpees: {
 			name: 'Burpees',
 			points: 5,
-			difficulty: 'medium',
-			body: 'Full body'
+			difficulty: 'Medium',
+			body: ['Full body']
 		},
 		squats: {
 			name: 'Squats',
 			points: 2,
-			difficulty: 'medium',
-			body: 'Legs'
+			difficulty: 'Medium',
+			body: ['Legs']
 		},
 		situps: {
 			name: 'Situps',
 			points: 3,
-			difficulty: 'medium',
-			body: 'Core'
-		}
+			difficulty: 'Medium',
+			body: ['Core']
+		},
+		pullups: {
+			name: 'Pullups',
+			points: 5,
+			difficulty: 'Hard',
+			body: ['Shoulders', 'Arms']
+		},
+		climbers: {
+			name: 'Climbers',
+			points: 3,
+			difficulty: 'Medium',
+			body: ['Core']
+		},
+		jumps: {
+			name: 'Jumps',
+			points: 3,
+			difficulty: 'Medium',
+			body: ['Core']
+		},
 	};
 
 	var workouts = {
@@ -340,5 +358,17 @@
 				difficulty: exercises[exerciseNames[i]].difficulty
 			});
 		}
+	});
+
+	app.controller('exercisePreview', function($scope, $location) {
+		var url = $location.absUrl().split('/');
+		var exercise = exercises[url[url.length - 2]];
+
+		$scope.exercise = {
+			name: exercise.name,
+			points: exercise.points,
+			difficulty: exercise.difficulty,
+			body: exercise.body.join(', ')
+		};
 	});
 })();

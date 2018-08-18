@@ -20,6 +20,8 @@ class ClientRouter {
 
     this.router.get('/exercise', (req, res) => res.render('exercise'));
 
+    this.router.get('/exercise/:id/preview', (req, res) => res.render('exercise-preview'));
+
     // this.router.get('/404', (req, res) => res.render('404'));
 
     // this.router.get('/*', (req, res) => res.redirect('/404'));
