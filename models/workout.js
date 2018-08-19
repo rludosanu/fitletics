@@ -23,7 +23,7 @@ module.exports = class Workout {
 				required: true
       },
       sets: {
-      	type: Sequelize.JSON,
+      	type: Sequelize.TEXT,
 				allowNull: false,
 				required: true
       }

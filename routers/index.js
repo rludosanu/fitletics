@@ -39,33 +39,57 @@ class UserRouter {
     this._app = app;
     this.router = express.Router();
 
-    /* Create */
-    this.router.post('/', this._app.controllers.user.create.bind(this));
+    /*
+    ** Create a new user account and send an activation link.
+    */
+    this.router.post('/signup', this._app.controllers.user.signup.bind(this));
 
-    /* Read */
-    this.router.get('/:token', this._app.controllers.user.read.bind(this));
+    /*
+    ** Check user username and password and return a json web token.
+    */
+    this.router.post('/signin', this._app.controllers.user.signin.bind(this));
 
-    /* Update */
-    this.router.put('/', this._app.controllers.user.update.bind(this));
+    /*
+    ** Get user account informations using a json web token.
+    */
+    this.router.get('/read', this._app.controllers.user.read.bind(this));
 
-    /* Delete */
-    this.router.delete('/', this._app.controllers.user.destroy.bind(this));
+    /*
+    ** Update user account informations using a json web token.
+    */
+    this.router.put('/update', this._app.controllers.user.update.bind(this));
+
+    /*
+    ** Activate user account.
+    */
+    this.router.put('/activate', this._app.controllers.user.activate.bind(this));
+
+    /*
+    ** Deactivate user account without deleting anything.
+    */
+    this.router.delete('/deactivate', this._app.controllers.user.deactivate.bind(this));
   }
 }
 
 class TrainingRouter {
-  this._app = app;
-  this.router = express.Router();
+  constructor(app) {
+    this._app = app;
+    this.router = express.Router();
+  }
 }
 
 class WorkoutRouter {
-  this._app = app;
-  this.router = express.Router();
+  constructor(app) {
+    this._app = app;
+    this.router = express.Router();
+  }
 }
 
 class ExerciseRouter {
-  this._app = app;
-  this.router = express.Router();
+  constructor(app) {
+    this._app = app;
+    this.router = express.Router();
+  }
 }
 
 class Router {

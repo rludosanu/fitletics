@@ -1,8 +1,5 @@
 const Sequelize = require('sequelize');
 
-body: ['Full body'],
-equipment: []
-
 module.exports = class Training {
 	constructor(app) {
 		this._app = app;

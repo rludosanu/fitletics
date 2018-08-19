@@ -1,8 +1,5 @@
 const Sequelize = require('sequelize');
 
-body: ['Full body'],
-equipment: []
-
 module.exports = class Exercise {
 	constructor(app) {
 		this._app = app;
@@ -36,7 +33,7 @@ module.exports = class Exercise {
 				defaultValue: null
 			},
 			equipment: {
-				type: Sequelize.ARRAY(Sequelize.STRING),
+				type: Sequelize.TEXT,
 				allowNull: true,
 				defaultValue: null
 			}

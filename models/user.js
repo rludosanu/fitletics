@@ -36,6 +36,16 @@ module.exports = class User {
 				type: Sequelize.STRING,
 				allowNull: false,
 				required: true
+			},
+			active: {
+				type: Sequelize.BOOLEAN,
+				allowNull: false,
+				required: true,
+				defaultValue: false
+			},
+			activationToken: {
+				type: Sequelize.UUID,
+				defaultValue: Sequelize.UUIDV4
 			}
 		});
 
