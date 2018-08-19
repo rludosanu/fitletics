@@ -1,16 +1,28 @@
 const express = require('express');
 const path = require('path');
+const morgan = require('morgan');
 
 class ClientRouter {
   constructor(app) {
     this._app = app;
     this.router = express.Router();
 
+    /* Debug */
+    this.router.use(morgan('dev'));
+
     /* Set up static files directory */
     this.router.use('/public', express.static(path.join(__dirname, '../public')));
 
     /* Set up routing */
     this.router.get('/', (req, res) => res.render('index'));
+
+    this.router.get('/signin', (req, res) => res.render('signin'));
+
+    this.router.get('/signup', (req, res) => res.render('signup'));
+
+    this.router.get('/activate/:token', (req, res) => res.render('activate'));
+
+    this.router.get('/dashboard', (req, res) => res.render('dashboard'));
 
     this.router.get('/workout', (req, res) => res.render('workout'));
 
@@ -38,6 +50,9 @@ class UserRouter {
   constructor(app) {
     this._app = app;
     this.router = express.Router();
+
+    /* Debug */
+    this.router.use(morgan('dev'));
 
     /*
     ** Create a new user account and send an activation link.

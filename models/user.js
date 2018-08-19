@@ -25,12 +25,14 @@ module.exports = class User {
 			username: {
 				type: Sequelize.STRING,
 				allowNull: false,
-				required: true
+				required: true,
+				unique: true
 			},
 			email: {
 				type: Sequelize.STRING,
 				allowNull: false,
-				required: true
+				required: true,
+				unique: true
 			},
 			password: {
 				type: Sequelize.STRING,

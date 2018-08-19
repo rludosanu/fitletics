@@ -1,6 +1,7 @@
 const joi = require('joi');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 
 module.exports = class User {
@@ -16,6 +17,7 @@ module.exports = class User {
   **    Create a new user account and send an activation link.
   */
 	signup(req, res) {
+    console.log('POST /api/user/signup');
     var datas = req.body;
     var self = this;
 
@@ -62,24 +64,21 @@ module.exports = class User {
           	to: datas.email,
           	subject: 'Welcome to Fitletics Coach',
           	html: `
-          	<div style="color: #444444; font-size: 15px; margin: 45px 0px;">
+          	<div style="color: #444444; font-size: 15px; margin: 45px 0px; width: 500px;">
           		<div style="font-size: 22px; margin-bottom: 25px;">
                 Hi ${datas.firstName} !
               </div>
               <div style="margin-bottom: 20px;">
-                Congratulations, you are a Fitletics Coach subscriber. You have decided to lead a healthier and happier life. Bravo.
+                Congratulations, you are a Fitletics Coach subscriber. You have decided to lead a healthier and happier life.
               </div>
               <div style="margin-bottom: 20px;">
-                Lead a new way of life, both mentally and physically. Start your Fitletics experience now.
+                Start your Fitletics experience now by activating your account on clicking on the following link <a href="http://192.168.1.26:3000/activate/${result.dataValues.activationToken}">http://192.168.1.26:3000/activate/${result.dataValues.activationToken}</a>.
               </div>
               <div style="margin-bottom: 20px;">
-                To activate your account please click the following link <a href="http://127.0.0.1:3000/activate/${result.dataValues.activationToken}">http://127.0.0.1:3000/activate/${result.dataValues.activationToken}</a>.
-              </div>
-              <div style="margin-bottom: 20px;">
-                Do you have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
+                You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
               </div>
           		<div>
-                Have fun and become the best version of yourself,
+                Enjoy your account,
                 <br />
                 <strong>Fitletics Team</strong>
               </div>
@@ -89,7 +88,7 @@ module.exports = class User {
 
           // Return a success message
           res.status(200).json({
-            message: 'User account created'
+            success: 'Congratulations, you are a Fitletics Coach subscriber. Check your emails to activate your account.'
           });
         })
         .catch((error) => res.status(500).json({
@@ -104,6 +103,7 @@ module.exports = class User {
   **    Check user username and password and return a json web token.
   */
   signin(req, res) {
+    console.log('POST /api/user/signin');
     var datas = req.body;
     var self = this;
 
@@ -122,7 +122,7 @@ module.exports = class User {
       // Match user email in database
       this._app.models.user.model.findOne({
         where: {
-          email: datas.email
+          username: datas.username
         }
       })
       .then((user) => {
@@ -263,7 +263,7 @@ module.exports = class User {
 	**   Activate user account by setting user "active" column to TRUE.
 	*/
 	activate(req, res) {
-    var datas = req.cookies;
+    var datas = req.body;
     var self = this;
 
     // Validate datas format
@@ -302,7 +302,7 @@ module.exports = class User {
         }
 
         res.status(200).json({
-          message: 'User account activated'
+          success: 'User account activated'
         });
 			})
       .catch(error => res.status(500).json({

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+{{=[[ ]]=}}
+<html ng-app="my-app">
+	<head>
+		<title>Fitletics Sign up</title>
+    <meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+		<style type="text/css">
+		html {
+		  background: #151515;
+		}
+
+		body {
+		  margin: 0px;
+		  padding: 0px;
+		  font-family: 'Open Sans';
+		}
+
+		a {
+		  text-decoration: none;
+		}
+
+		#navigation {
+			height: calc(60px);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			font-size: 22px;
+			color: white;
+			background: #292929;
+			margin-bottom: 25px;
+		}
+
+		#navigation .item {
+			padding: 0px 15px;
+		}
+
+		#navigation .item a {
+			color: white;
+			text-decoration: none;
+		}
+
+		#navigation .title {
+			font-weight: bold;
+		}
+
+		#screen .container {
+			padding: 15px;
+		}
+
+		#screen .form input[type="text"],
+		#screen .form input[type="email"],
+		#screen .form input[type="password"] {
+			width: 100%;
+			box-sizing: border-box;
+			border-top: none;
+			border-right: none;
+			border-left: none;
+			border-bottom: 1px solid #292929;
+			font-size: 15px;
+			color: white;
+			background: none;
+			font-family: 'Open Sans';
+			padding: 15px 10px;
+			margin-bottom: 15px;
+			outline: none;
+		}
+
+		#screen .form input[type="submit"] {
+			width: 100%;
+			box-sizing: border-box;
+			border: 1px solid #292929;
+			font-size: 15px;
+			color: white;
+			background: #292929;
+			font-family: 'Open Sans';
+			padding: 15px 10px;
+			margin-bottom: 25px;
+			outline: none;
+		}
+
+		#popup {
+			position: absolute;
+			z-index: 10;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: rgba(0, 0, 0, 0.8);
+		}
+
+		#popup .container {
+			padding: 10px;
+			width: 100%;
+		}
+
+		#popup .container .content {
+			background: white;
+			padding: 25px 15px;
+		}
+
+		#popup .container .content h4 {
+			margin: 0px 0px 5px 0px;
+			font-size: 17px;
+			font-weight: bold;
+		}
+
+		#popup .container .content p {
+			margin: 0px 0px 25px 0px;
+			font-size: 15px;
+		}
+
+		#popup .container .content a {
+			color: #3B7FF1;
+			font-size: 15px;
+			margin: 0px 10px;
+		}
+
+		.txt-right {
+			text-align: right;
+		}
+		</style>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
+	</head>
+	<body ng-controller="userSignup">
+		<div id="popup" ng-show="validation.display">
+			<div class="container">
+				<div class="content" style="">
+					<h4>{{ validation.title }}</h4>
+					<p>{{ validation.context }}</p>
+					<div class="txt-right">
+						<a ng-click="validation.display = false">OK</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="navigation">
+			<div class="item">
+				<a href="/">
+					<span class="fa fa-fw fa-circle-o-notch"></span>
+				</a>
+			</div>
+			<div class="item title">
+				Fitletics
+			</div>
+			<div class="item">
+				<span class="fa fa-fw fa-bars"></span>
+			</div>
+		</div>
+
+		<div id="screen">
+			<div class="container">
+				<div class="form">
+					<form ng-submit="signup()">
+						<input type="text" placeholder="First name" ng-model="user.firstName" />
+						<input type="text" placeholder="Last name" ng-model="user.lastName" />
+						<input type="text" placeholder="Username" ng-model="user.username" />
+						<input type="email" placeholder="email" ng-model="user.email" />
+						<input type="password" placeholder="Password" ng-model="user.password" />
+						<input type="submit" value="Sign up" />
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- <script src="/public/controllers/user.js"></script> -->
+		<script>
+		(function() {
+			var app = angular.module('my-app', ['ngCookies']);
+
+			app.controller('userSignup', function($scope, $http, $window) {
+				$scope.user = {
+					firstName: 'Razvan',
+					lastName: 'Ludosanu',
+					username: 'rludosanu',
+					email: 'r.ludosanu@gmail.com',
+					password: 'ludosanu'
+				};
+
+				$scope.validation = {
+					display: false,
+					title: '',
+					context: ''
+				};
+
+				$scope.signup = function() {
+					console.log($scope.user);
+
+					$http({
+						method: 'POST',
+						url: 'http://192.168.1.26:3000/api/user/signup',
+						data: {
+							firstName: $scope.user.firstName,
+							lastName: $scope.user.lastName,
+							username: $scope.user.username,
+							email: $scope.user.email,
+							password: $scope.user.password
+						}
+					})
+					.then((result) => {
+		        console.log(result);
+						$scope.validation = {
+							display: true,
+							title: 'Account created',
+							context: result.data.success
+						};
+		      })
+		      .catch((error) => {
+		        console.error(error);
+						$scope.validation = {
+							display: true,
+							title: 'Form error',
+							context: error.data.error
+						};
+		      });
+				}
+			});
+		})();
+		</script>
+	</body>
+</html>

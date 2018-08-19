@@ -2,72 +2,117 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>MyApp Home</title>
-
+		<title>Fitletics</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
-
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+		<style type="text/css">
+		html {
+		  background: #151515;
+		}
 
-		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
+		body {
+		  margin: 0px;
+		  padding: 0px;
+		  font-family: 'Open Sans';
+		}
 
+		a {
+		  text-decoration: none;
+		}
+
+		#screen {
+			position: absolute;
+			z-index: 1;
+			top: 0x;
+			left: 0px;
+			width: 100%;
+			height: calc(100% - 50px);
+			overflow-y: auto;
+			display: flex;
+			align-items: flex-end;
+			justify-content: center;
+			background-image: url('https://images.pexels.com/photos/414029/pexels-photo-414029.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+		}
+
+		#screen .content {
+			padding: 25px;
+			text-align: center;
+		}
+
+		#screen .content .title {
+			color: white;
+			font-size: 22px;
+			font-weight: bold;
+		}
+
+		#footer {
+			position: absolute;
+			z-index: 1;
+			bottom: 0px;
+			left: 0px;
+			width: 100%;
+			height: 50px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		#footer input {
+			width: 50%;
+			height: 100%;
+			font-family: 'Open Sans';
+			font-size: 15px;
+			border: none;
+			color: white;
+			outline: none;
+		}
+
+		#footer .signup {
+			background: #4CC417
+		}
+
+		#footer .signin {
+			background: none;
+		}
+		</style>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
 	<body ng-controller="index">
-		<div style="position: absolute; z-index: 10; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.8);" ng-show="allowFullscreen == null">
-			<div style="padding: 10px; width: 100%;">
-				<div style="background: white; padding: 25px 15px;">
-					<div style="margin-bottom: 5px; font-size: 17px; font-weight: bold;">Enter fullscreen mode</div>
-					<div style="margin-bottom: 25px; font-size: 15px;">Fullscreen mode will provide you a much better experience. Would you like to activate it ?</div>
-					<div style="text-align: right;">
-						<a ng-click="rejectFullscreen()" style="color: #3B7FF1; font-size: 15px; margin: 0px 10px;">NO</a>
-						<a ng-click="acceptFullscreen()" style="color: #3B7FF1; font-size: 15px; margin: 0px 10px;">YES</a>
-					</div>
-				</div>
+		<!-- Screen -->
+		<div id="screen">
+			<div class="content">
+				<div class="title">Set free the athlete in you</div>
 			</div>
 		</div>
+		<!-- END Screen -->
 
-		<div id="index-container">
-			<div id="training">
-				<a href="/workout">
-					<div class="layer layer-workouts">
-						<div class="layer-content">
-							<h2>Workouts</h2>
-							<p>Predefined workouts for every level</p>
-						</div>
-					</div>
-				</a>
-				<div class="layer layer-coach">
-					<div class="layer-content">
-						<h2>Coach</h2>
-						<p>Generate a new radom workout</p>
-					</div>
-				</div>
-				<a href="/exercise">
-					<div class="layer layer-individuals">
-						<div class="layer-content">
-							<h2>Individual Exercises</h2>
-							<p>Target spectific muscles</p>
-						</div>
-					</div>
-				</a>
-				<div class="layer layer-locations">
-					<div class="layer-content">
-						<h2>Training Locations</h2>
-						<p>Find other fitletics athletes</p>
-					</div>
-				</div>
-			</div>
+		<!-- Footer -->
+		<div id="footer">
+			<input type="button" value="Sign up" class="signup" ng-click="signup()" />
+			<input type="button" value="Sign in" class="signin" ng-click="signin()" />
 		</div>
+		<!-- END Footer -->
 
-		<footer id="footer" class="bg-lightbrown">
-			<span class="fa fa-fw fa-bar-chart-o"></span>
-			<a href="/user/profile/"><span class="fa fa-fw fa-user"></span></a>
-		</footer>
+		<script>
+		(function() {
+			var app = angular.module('my-app', ['ngCookies']);
 
-		<script src="/public/controllers/workout.js"></script>
+			app.controller('index', function($scope, $window) {
+				$scope.signup = function() {
+					$window.location.href = '/signup';
+				};
+
+				$scope.signin = function() {
+					$window.location.href = '/signin';
+				};
+			});
+		})();
+		</script>
 	</body>
 </html>
