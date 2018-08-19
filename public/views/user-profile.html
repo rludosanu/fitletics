@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{{=[[ ]]=}}
+<html ng-app="my-app">
+	<head>
+		<title>MyApp User Profile</title>
+
+    <meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+
+		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
+		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
+
+		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script> -->
+		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script> -->
+	</head>
+	<body ng-controller="userProfile">
+		<div style="position: absolute; z-index: 1; top: 0px; left: 0px; width: 100%; height: calc(100% - 50px); overflow: auto;">
+			<div style="display: flex; justify-content: space-between; align-items: center; color: white; font-size: 18px; font-weight: bold; padding: 15px 15px; margin-bottom: 50px;">
+				<div>
+					<a href="/" style="color: white;">
+						<span class="fa fa-fw fa-arrow-left"></span>
+					</a>
+				</div>
+				<div>
+					Profile
+				</div>
+				<div>
+					<a href="/user/settings" style="color: white;">
+						<span class="fa fa-fw fa-cog"></span>
+					</a>
+				</div>
+			</div>
+
+			<div style="margin-bottom: 25px;">
+				<div style="width: 120px; margin: 0px auto 10px auto;">
+					<img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" style="width: 100%; border-radius: 999px;" />
+				</div>
+				<div style="text-align: center; font-size: 18px; color: white;">
+					Razvan Ludosanu
+				</div>
+			</div>
+
+			<div style="padding: 15px;">
+				<div style="height: 24px; background: #292929; border-radius: 6px;"></div>
+				<div style="height: 24px; background: #3B7FF1; margin-top: -24px; width: 45%; border-radius: 6px;"></div>
+				<div style="height: 24px; margin-top: -24px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">Level 2 - 45%</div>
+			</div>
+
+			<div style="display: flex; justify-content: space-between; align-items: center; color: white; font-size: 18px; padding: 15px 15px; margin-bottom: 15px;">
+				<div style="text-align: center;">
+					<div style="font-size: 15px;">2</div>
+					<div style="font-size: 12px; color: #C7C6C4;">Level</div>
+				</div>
+				<div style="text-align: center;">
+					<div style="font-size: 15px;">113</div>
+					<div style="font-size: 12px; color: #C7C6C4;">Workouts</div>
+				</div>
+				<div style="text-align: center;">
+					<div style="font-size: 15px;">153,152</div>
+					<div style="font-size: 12px; color: #C7C6C4;">Points</div>
+				</div>
+			</div>
+
+			<div style="padding: 3px 0px;">
+				<div style="padding: 15px; background: white;">
+					<div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #C7C6C4; margin-bottom: 5px;">
+						<div>Workout</div>
+						<div>2d</div>
+					</div>
+					<div style="display: flex; justify-content: space-between; align-items: center; font-size: 15px;">
+						<div>Hyperion</div>
+						<div>15:43</div>
+					</div>
+				</div>
+			</div>
+
+			<div style="padding: 3px 0px;">
+				<div style="padding: 15px; background: white;">
+					<div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #C7C6C4; margin-bottom: 5px;">
+						<div>Workout</div>
+						<div>3d</div>
+					</div>
+					<div style="display: flex; justify-content: space-between; align-items: center; font-size: 15px;">
+						<div>Athena</div>
+						<div>08:15</div>
+					</div>
+				</div>
+			</div>
+
+			<div style="padding: 3px 0px;">
+				<div style="padding: 15px; background: white;">
+					<div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #C7C6C4; margin-bottom: 5px;">
+						<div>Exercise</div>
+						<div>3d</div>
+					</div>
+					<div style="display: flex; justify-content: space-between; align-items: center; font-size: 15px;">
+						<div>50x Burpees</div>
+						<div>05:15</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<footer id="footer" class="bg-lightbrown">
+			<span class="fa fa-fw fa-bar-chart-o"></span>
+			<a href="/user/profile/"><span class="fa fa-fw fa-user"></span></a>
+		</footer>
+
+		<!-- <script src="/public/controllers/workout.js"></script> -->
+	</body>
+</html>

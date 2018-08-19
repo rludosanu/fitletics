@@ -22,6 +22,12 @@ class ClientRouter {
 
     this.router.get('/exercise/:id/preview', (req, res) => res.render('exercise-preview'));
 
+    this.router.get('/exercise/:id/live/:repetitions', (req, res) => res.render('exercise-live'));
+
+    this.router.get('/user/profile', (req, res) => res.render('user-profile'));
+
+    this.router.get('/user/settings', (req, res) => res.render('user-settings'));
+
     // this.router.get('/404', (req, res) => res.render('404'));
 
     // this.router.get('/*', (req, res) => res.redirect('/404'));

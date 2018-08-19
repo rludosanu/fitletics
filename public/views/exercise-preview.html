@@ -25,34 +25,46 @@
       </div>
     </header>
 
-		<div id="preview-container">
+		<div style="position: absolute; z-index: 1; top: 60px; left: 0px; width: 100%; height: calc(100% - 110px); overflow: auto;">
 			<div id="workout-preview-header">
 				<div class="content">
 					<table>
 						<tr>
 							<td><span class="fa fa-fw fa-rub"></span>&nbsp;Points</td>
-							<td>{{ exercise.points }}</td>
+							<td>{{ exercise.points * repetitions }}</td>
 						</tr>
 						<tr>
 							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Difficulty</td>
 							<td>{{ exercise.difficulty }}</td>
 						</tr>
 						<tr>
+							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Equipment</td>
+							<td>{{ exercise.equipment }}</td>
+						</tr>
+						<tr>
 							<td><span class="fa fa-fw fa-dot-circle-o"></span>&nbsp;Body target</td>
 							<td>{{ exercise.body }}</td>
+						</tr>
+						<tr>
+							<td><span class="fa fa-fw fa-signal"></span>&nbsp;Repetitions</td>
+							<td>
+								<select style="background: none; border: none; color: white; font-size: 14px; padding: 0px; margin: 0px; text-align: right;" ng-model="repetitions">
+									<option value="10">10</option>
+									<option value="25">25</option>
+									<option value="50">50</option>
+									<option value="100">100</option>
+									<option value="150">150</option>
+									<option value="200">200</option>
+								</select>
+							</td>
 						</tr>
 					</table>
 				</div>
 			</div>
 		</div>
-		<div id="workout-preview-body">
-			<div class="layer">
-				Hello World !
-			</div>
-		</div>
 
 		<footer id="footer" class="bg-blue">
-			<a href="/exercise/{{ exercise.name.toLowerCase() }}/live">
+			<a href="/exercise/{{ exercise.name.toLowerCase() }}/live/{{ repetitions }}">
 				Start
 			</a>
 		</footer>
