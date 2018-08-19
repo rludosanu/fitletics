@@ -1,42 +1,32 @@
 const Sequelize = require('sequelize');
 
-module.exports = class User {
+module.exports = class Workout {
 	constructor(app) {
 		this._app = app;
 		this.reset = this._app.config.models.sync;
 
-		this.model = this._app.database.sequelize.define('user', {
+		this.model = this._app.database.sequelize.define('workout', {
 			id: {
 				type: Sequelize.INTEGER,
 				primaryKey: true,
 				allowNull: false,
 				autoIncrement: true
 			},
-			firstName: {
+			name: {
 				type: Sequelize.STRING,
 				allowNull: false,
 				required: true
 			},
-			lastName: {
-				type: Sequelize.STRING,
+      duration: {
+				type: Sequelize.INTEGER,
 				allowNull: false,
 				required: true
-			},
-			username: {
-				type: Sequelize.STRING,
+      },
+      sets: {
+      	type: Sequelize.JSON,
 				allowNull: false,
 				required: true
-			},
-			email: {
-				type: Sequelize.STRING,
-				allowNull: false,
-				required: true
-			},
-			password: {
-				type: Sequelize.STRING,
-				allowNull: false,
-				required: true
-			}
+      }
 		});
 
 		this.model.sync({

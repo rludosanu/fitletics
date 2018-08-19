@@ -28,9 +28,9 @@ class ClientRouter {
 
     this.router.get('/user/settings', (req, res) => res.render('user-settings'));
 
-    // this.router.get('/404', (req, res) => res.render('404'));
+    this.router.get('/404', (req, res) => res.render('404'));
 
-    // this.router.get('/*', (req, res) => res.redirect('/404'));
+    this.router.get('/*', (req, res) => res.redirect('/404'));
   }
 }
 
@@ -53,12 +53,30 @@ class UserRouter {
   }
 }
 
+class TrainingRouter {
+  this._app = app;
+  this.router = express.Router();
+}
+
+class WorkoutRouter {
+  this._app = app;
+  this.router = express.Router();
+}
+
+class ExerciseRouter {
+  this._app = app;
+  this.router = express.Router();
+}
+
 class Router {
   constructor(app) {
     this._app = app;
 
     this.client = new ClientRouter(app);
     this.user = new UserRouter(app);
+    this.training = new TrainingRouter(app);
+    this.workout = new WorkoutRouter(app);
+    this.exercise = new ExerciseRouter(app);
   }
 }
 

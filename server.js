@@ -7,8 +7,8 @@ const mustacheExpress = require('mustache-express');
 const path = require('path');
 
 const Config = require('./config/index');
-// const Database = require('./database/index');
-// const Models = require('./models/index');
+const Database = require('./database/index');
+const Models = require('./models/index');
 const Controllers = require('./controllers/index');
 const Routers = require('./routers/index');
 
@@ -17,8 +17,8 @@ class Server {
 		/* Confirguration file */
 		this.config = config;
 
-		// this.database = new Database(this);
-		// this.models = new Models(this);
+		this.database = new Database(this);
+		this.models = new Models(this);
 		this.controllers = new Controllers(this);
 		this.routers = new Routers(this);
 
@@ -44,6 +44,15 @@ class Server {
 
 		/* User API router */
 		this.app.use('/api/user', this.routers.user.router);
+
+		/* Workout API router */
+		// this.app.use('/api/workout', this.routers.workout.router);
+
+		/* Exercise API router */
+		// this.app.use('/api/exercise', this.routers.exercise.router);
+
+		/* Training API router */
+		// this.app.use('/api/training', this.routers.training.router);
 
 		/* Server */
 		this.server = http.createServer(this.app);
