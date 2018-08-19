@@ -72,7 +72,7 @@ module.exports = class User {
                 Congratulations, you are a Fitletics Coach subscriber. You have decided to lead a healthier and happier life.
               </div>
               <div style="margin-bottom: 20px;">
-                Start your Fitletics experience now by activating your account on clicking on the following link <a href="http://192.168.1.26:3000/activate/${result.dataValues.activationToken}">http://192.168.1.26:3000/activate/${result.dataValues.activationToken}</a>.
+                Start your Fitletics experience now by activating your account. Click on the following link <a href="http://192.168.1.26:3000/activate/${result.dataValues.activationToken}">http://192.168.1.26:3000/activate/${result.dataValues.activationToken}</a>.
               </div>
               <div style="margin-bottom: 20px;">
                 You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
@@ -192,7 +192,7 @@ module.exports = class User {
         }
 
         // Read from database
-        this._app.models.user.model.findOne({
+        self._app.models.user.model.findOne({
           attributes: ['firstName', 'lastName', 'username', 'email'],
           where: {
             id: decoded.id
@@ -241,7 +241,7 @@ module.exports = class User {
         }
 
         // Update database entry
-        this._app.models.user.model.update({
+        self._app.models.user.model.update({
           firstName: datas.firstName,
           lastName: datas.lastName,
           username: datas.username,
@@ -278,7 +278,7 @@ module.exports = class User {
       }
 
       // Update database entry
-      this._app.models.user.model.update({
+      self._app.models.user.model.update({
 				active: true,
 				activationToken: null
 			}, {
@@ -340,10 +340,9 @@ module.exports = class User {
         }
 
         // Update database entry
-        this._app.models.user.model.update({
+        self._app.models.user.model.update({
           active: false
-        },
-        {
+        }, {
           where: {
             id: decoded.id
           }
@@ -353,4 +352,93 @@ module.exports = class User {
       });
     });
 	}
+
+  /*
+  ** Reset
+  **    Reset user password and send it by email.
+  */
+  reset(req, res) {
+    console.log('POST /api/user/reset');
+    var datas = req.body;
+    var self = this;
+    var generatePassword = function() {
+      var password = '';
+      var base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+      for (var i = 0; i < 8; i++) {
+        password += base.charAt(Math.floor(Math.random() * base.length));
+      }
+
+      return password;
+    };
+    var newPassword = generatePassword();
+
+    // Validate data format
+    joi.validate(datas, joi.object().keys({
+      email: joi.string().email().required(),
+    }), (error, result) => {
+      // Invalid data format
+      if (error) {
+        return res.status(400).json({
+          error: error.details[0].message
+        });
+      }
+
+      // Encrypt password
+      bcrypt.hash(newPassword, 10, function(error, hash) {
+        // Password encryption error
+        if (error) {
+          return res.status(500).json({
+            error: 'Unable to encrypt password'
+          });
+        }
+
+        // Match user email in database
+        self._app.models.user.model.update({
+          password: hash
+        }, {
+          where: {
+            username: datas.username
+          }
+        })
+        .then((user) => {
+          if (!user) {
+            return res.status(401).json({
+              error: 'User account not found'
+            });
+          }
+
+          // Send the new password
+          nodemailer.createTransport(self._app.config.mail).sendMail({
+            from: 'Fitletics Coach<fitleticscoach@gmail.com>',
+            to: datas.email,
+            subject: 'Your password has been reset',
+            html: `
+            <div style="color: #444444; font-size: 15px; margin: 45px 0px; width: 500px;">
+              <div style="font-size: 22px; margin-bottom: 25px;">
+                Hi !
+              </div>
+              <div style="margin-bottom: 20px;">
+                You requested to reset your password. Your new password is <strong>${newPassword}</strong>. You can sign in by clicking the folling link <a href="http://192.168.1.26:3000/signin">http://192.168.1.26:3000/signin</a>.
+              </div>
+              <div style="margin-bottom: 20px;">
+                You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
+              </div>
+              <div>
+                Enjoy your account,
+                <br />
+                <strong>Fitletics Team</strong>
+              </div>
+            </div>
+            `
+          });
+
+          res.status(200).json({
+            success: 'Your password was reset. Check your emails to recover your new password.'
+          });
+        })
+        .catch((error) => res.status(500).json(error));
+      });
+    });
+  }
 }

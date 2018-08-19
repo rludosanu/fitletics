@@ -20,6 +20,8 @@ class ClientRouter {
 
     this.router.get('/signup', (req, res) => res.render('signup'));
 
+    this.router.get('/reset', (req, res) => res.render('reset'));
+
     this.router.get('/activate/:token', (req, res) => res.render('activate'));
 
     this.router.get('/dashboard', (req, res) => res.render('dashboard'));
@@ -78,6 +80,11 @@ class UserRouter {
     ** Activate user account.
     */
     this.router.put('/activate', this._app.controllers.user.activate.bind(this));
+
+    /*
+    ** Reset user password and send it by email.
+    */
+    this.router.put('/reset', this._app.controllers.user.reset.bind(this));
 
     /*
     ** Deactivate user account without deleting anything.

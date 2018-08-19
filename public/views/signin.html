@@ -2,7 +2,7 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>Fitletics Sign in</title>
+		<title>Fitletics Sign In</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
@@ -121,6 +121,30 @@
 		.txt-right {
 			text-align: right;
 		}
+
+		#menu {
+			position: absolute;
+			z-index: 2;
+			top: 61px;
+			right: 0px;
+			width: 80%;
+			height: calc(100% - 61px);
+			overflow: auto;
+			background: #292929;
+		}
+
+		#menu .container ul {
+			margin: 0;
+			padding: 0;
+		}
+
+		#menu .container ul a li {
+			list-style-type: none;
+			font-size: 15px;
+			padding: 15px;
+			color: white;
+			border-bottom: 1px solid black;
+		}
 		</style>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
@@ -128,7 +152,7 @@
 	<body ng-controller="userSignin">
 		<div id="popup" ng-show="validation.display">
 			<div class="container">
-				<div class="content" style="">
+				<div class="content">
 					<h4>{{ validation.title }}</h4>
 					<p>{{ validation.context }}</p>
 					<div class="txt-right">
@@ -147,8 +171,18 @@
 			<div class="item title">
 				Fitletics
 			</div>
-			<div class="item">
-				<span class="fa fa-fw fa-bars"></span>
+			<div class="item" ng-click="menu.toggle()">
+				<span class="fa fa-fw" ng-class="{'fa-bars': !menu.display, 'fa-times': menu.display}"></span>
+			</div>
+		</div>
+
+		<div id="menu" ng-show="menu.display">
+			<div class="container">
+				<ul>
+					<a href="/signin"><li>Sign in</li></a>
+					<a href="/signup"><li>Sign up</li></a>
+					<a href="/reset"><li>Reset password</li></a>
+				</ul>
 			</div>
 		</div>
 
@@ -179,6 +213,13 @@
 					display: false,
 					title: '',
 					context: ''
+				};
+
+				$scope.menu = {
+					display: false,
+					toggle: function() {
+						this.display = !this.display;
+					}
 				};
 
 				$scope.signin = function() {
