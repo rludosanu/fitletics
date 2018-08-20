@@ -7,251 +7,77 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-		<style type="text/css">
-		html {
-		  background: #151515;
-		}
-
-		body {
-		  margin: 0px;
-		  padding: 0px;
-		  font-family: 'Open Sans';
-		}
-
-		a {
-		  text-decoration: none;
-		}
-
-		#navigation {
-			height: calc(60px);
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			font-size: 22px;
-			color: white;
-			background: #292929;
-			margin-bottom: 25px;
-		}
-
-		#navigation .item {
-			padding: 0px 15px;
-		}
-
-		#navigation .item a {
-			color: white;
-			text-decoration: none;
-		}
-
-		#navigation .title {
-			font-weight: bold;
-		}
-
-		#screen .container {
-			padding: 15px;
-		}
-
-		#screen .form input[type="text"],
-		#screen .form input[type="password"] {
-			width: 100%;
-			box-sizing: border-box;
-			border-top: none;
-			border-right: none;
-			border-left: none;
-			border-bottom: 1px solid #292929;
-			font-size: 15px;
-			color: white;
-			background: none;
-			font-family: 'Open Sans';
-			padding: 15px 10px;
-			margin-bottom: 15px;
-			outline: none;
-		}
-
-		#screen .form input[type="submit"] {
-			width: 100%;
-			box-sizing: border-box;
-			border: 1px solid #292929;
-			font-size: 15px;
-			color: white;
-			background: #292929;
-			font-family: 'Open Sans';
-			padding: 15px 10px;
-			margin-bottom: 25px;
-			outline: none;
-		}
-
-		#popup {
-			position: absolute;
-			z-index: 10;
-			width: 100%;
-			height: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			background: rgba(0, 0, 0, 0.8);
-		}
-
-		#popup .container {
-			padding: 10px;
-			width: 100%;
-		}
-
-		#popup .container .content {
-			background: white;
-			padding: 25px 15px;
-		}
-
-		#popup .container .content h4 {
-			margin: 0px 0px 5px 0px;
-			font-size: 17px;
-			font-weight: bold;
-		}
-
-		#popup .container .content p {
-			margin: 0px 0px 25px 0px;
-			font-size: 15px;
-		}
-
-		#popup .container .content a {
-			color: #3B7FF1;
-			font-size: 15px;
-			margin: 0px 10px;
-		}
-
-		.txt-right {
-			text-align: right;
-		}
-
-		#menu {
-			position: absolute;
-			z-index: 2;
-			top: 61px;
-			right: 0px;
-			width: 80%;
-			height: calc(100% - 61px);
-			overflow: auto;
-			background: #292929;
-		}
-
-		#menu .container ul {
-			margin: 0;
-			padding: 0;
-		}
-
-		#menu .container ul a li {
-			list-style-type: none;
-			font-size: 15px;
-			padding: 15px;
-			color: white;
-			border-bottom: 1px solid black;
-		}
-		</style>
+		<link rel="stylesheet" href="/public/stylesheets/common.css" />
+		<link rel="stylesheet" href="/public/stylesheets/unlogged.css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
-	<body ng-controller="userSignin">
-		<div id="popup" ng-show="validation.display">
-			<div class="container">
-				<div class="content">
-					<h4>{{ validation.title }}</h4>
-					<p>{{ validation.context }}</p>
-					<div class="txt-right">
-						<a ng-click="validation.display = false">OK</a>
+	<body>
+		<section ng-controller="userMenu">
+			<!-- Navigation -->
+			<header id="navigation">
+				<div class="item">
+					<a href="/">
+						<span class="fa fa-fw fa-circle-o-notch"></span>
+					</a>
+				</div>
+				<div class="item title">
+					Fitletics
+				</div>
+				<div class="item" ng-click="menu.toggle()">
+					<span class="fa fa-fw" ng-class="{'fa-bars': !menu.display, 'fa-times': menu.display}"></span>
+				</div>
+			</header>
+			<!-- END Navigation -->
+
+			<!-- Side menu -->
+			<aside id="menu" ng-show="menu.display">
+				<ul>
+					<ul>
+						<a href="/signin">
+							<li>Sign in</li>
+						</a>
+						<a href="/signup">
+							<li>Sign up</li>
+						</a>
+						<a href="/reset">
+							<li>Reset password</li>
+						</a>
+					</ul>
+				</ul>
+			</aside>
+			<!-- END Side menu -->
+		</section>
+
+
+		<!-- Signin section -->
+		<section ng-controller="userSignin">
+			<div id="popup" ng-show="validation.display">
+				<div class="container">
+					<div class="content">
+						<h4>{{ validation.title }}</h4>
+						<p>{{ validation.context }}</p>
+						<div class="txt-right">
+							<a ng-click="validation.display = false">OK</a>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<div id="navigation">
-			<div class="item">
-				<a href="/">
-					<span class="fa fa-fw fa-circle-o-notch"></span>
-				</a>
-			</div>
-			<div class="item title">
-				Fitletics
-			</div>
-			<div class="item" ng-click="menu.toggle()">
-				<span class="fa fa-fw" ng-class="{'fa-bars': !menu.display, 'fa-times': menu.display}"></span>
-			</div>
-		</div>
-
-		<div id="menu" ng-show="menu.display">
-			<div class="container">
-				<ul>
-					<a href="/signin"><li>Sign in</li></a>
-					<a href="/signup"><li>Sign up</li></a>
-					<a href="/reset"><li>Reset password</li></a>
-				</ul>
-			</div>
-		</div>
-
-		<div id="screen">
-			<div class="container">
-				<div class="form">
-					<form ng-submit="signin()">
-						<input type="text" placeholder="Username" ng-model="user.username" />
-						<input type="password" placeholder="Password" ng-model="user.password" />
-						<input type="submit" value="Sign in" />
-					</form>
+			<div id="screen">
+				<div class="container">
+					<div class="form">
+						<form ng-submit="signin()">
+							<input type="text" placeholder="Username" ng-model="user.username" />
+							<input type="password" placeholder="Password" ng-model="user.password" />
+							<input type="submit" value="Sign in" />
+						</form>
+					</div>
 				</div>
 			</div>
-		</div>
+		</section>
+		<!-- END Signin section -->
 
-		<!-- <script src="/public/controllers/user.js"></script> -->
-		<script>
-		(function() {
-			var app = angular.module('my-app', ['ngCookies']);
-
-			app.controller('userSignin', function($scope, $http, $window, $cookies) {
-				$scope.user = {
-					username: 'rludosanu',
-					password: 'ludosanu'
-				};
-
-				$scope.validation = {
-					display: false,
-					title: '',
-					context: ''
-				};
-
-				$scope.menu = {
-					display: false,
-					toggle: function() {
-						this.display = !this.display;
-					}
-				};
-
-				$scope.signin = function() {
-					console.log($scope.user);
-
-					$http({
-		        method: 'POST',
-		        url: 'http://192.168.1.26:3000/api/user/signin',
-		        data: {
-							username: $scope.user.username,
-							password: $scope.user.password,
-		        }
-		      })
-		      .then((result) => {
-		        console.log(result);
-						$scope.validation = {
-							display: true,
-							title: 'Success',
-							context: result.data.token
-						};
-		      })
-		      .catch((error) => {
-		        console.error(error);
-						$scope.validation = {
-							display: true,
-							title: 'Error',
-							context: error.data.error
-						};
-		      });
-				}
-			});
-		})();
-		</script>
+		<script src="/public/controllers/user.js"></script>
 	</body>
 </html>

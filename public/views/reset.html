@@ -7,177 +7,75 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-		<style type="text/css">
-		html {
-		  background: #151515;
-		}
-
-		body {
-		  margin: 0px;
-		  padding: 0px;
-		  font-family: 'Open Sans';
-		}
-
-		a {
-		  text-decoration: none;
-		}
-
-		#navigation {
-			height: calc(60px);
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			font-size: 22px;
-			color: white;
-			background: #292929;
-			margin-bottom: 25px;
-		}
-
-		#navigation .item {
-			padding: 0px 15px;
-		}
-
-		#navigation .item a {
-			color: white;
-			text-decoration: none;
-		}
-
-		#navigation .title {
-			font-weight: bold;
-		}
-
-		#screen .container {
-			padding: 15px;
-		}
-
-		#screen .form input[type="email"] {
-			width: 100%;
-			box-sizing: border-box;
-			border-top: none;
-			border-right: none;
-			border-left: none;
-			border-bottom: 1px solid #292929;
-			font-size: 15px;
-			color: white;
-			background: none;
-			font-family: 'Open Sans';
-			padding: 15px 10px;
-			margin-bottom: 15px;
-			outline: none;
-		}
-
-		#screen .form input[type="submit"] {
-			width: 100%;
-			box-sizing: border-box;
-			border: 1px solid #292929;
-			font-size: 15px;
-			color: white;
-			background: #292929;
-			font-family: 'Open Sans';
-			padding: 15px 10px;
-			margin-bottom: 25px;
-			outline: none;
-		}
-
-		#menu {
-			position: absolute;
-			z-index: 2;
-			top: 61px;
-			right: 0px;
-			width: 80%;
-			height: calc(100% - 61px);
-			overflow: auto;
-			background: #292929;
-		}
-
-		#menu .container ul {
-			margin: 0;
-			padding: 0;
-		}
-
-		#menu .container ul a li {
-			list-style-type: none;
-			font-size: 15px;
-			padding: 15px;
-			color: white;
-			border-bottom: 1px solid black;
-		}
-		</style>
+		<link rel="stylesheet" href="/public/stylesheets/common.css" />
+		<link rel="stylesheet" href="/public/stylesheets/unlogged.css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
-	<body ng-controller="userReset">
-		<div id="navigation">
-			<div class="item">
-				<a href="/">
-					<span class="fa fa-fw fa-circle-o-notch"></span>
-				</a>
-			</div>
-			<div class="item title">
-				Fitletics
-			</div>
-			<div class="item" ng-click="menu.toggle()">
-				<span class="fa fa-fw" ng-class="{'fa-bars': !menu.display, 'fa-times': menu.display}"></span>
-			</div>
-		</div>
+	<body>
+		<section ng-controller="userMenu">
+			<!-- Navigation -->
+			<header id="navigation">
+				<div class="item">
+					<a href="/">
+						<span class="fa fa-fw fa-circle-o-notch"></span>
+					</a>
+				</div>
+				<div class="item title">
+					Fitletics
+				</div>
+				<div class="item" ng-click="menu.toggle()">
+					<span class="fa fa-fw" ng-class="{'fa-bars': !menu.display, 'fa-times': menu.display}"></span>
+				</div>
+			</header>
+			<!-- END Navigation -->
 
-		<div id="menu" ng-show="menu.display">
-			<div class="container">
+			<!-- Side menu -->
+			<aside id="menu" ng-show="menu.display">
 				<ul>
-					<a href="/signin"><li>Sign in</li></a>
-					<a href="/signup"><li>Sign up</li></a>
-					<a href="/reset"><li>Reset password</li></a>
+					<ul>
+						<a href="/signin">
+							<li>Sign in</li>
+						</a>
+						<a href="/signup">
+							<li>Sign up</li>
+						</a>
+						<a href="/reset">
+							<li>Reset password</li>
+						</a>
+					</ul>
 				</ul>
-			</div>
-		</div>
+			</aside>
+			<!-- END Side menu -->
+		</section>
 
-		<div id="screen">
-			<div class="container">
-				<div class="form">
-					<form ng-submit="reset()">
-						<input type="email" placeholder="Email address" ng-model="user.email" />
-						<input type="submit" value="Reset password" />
-					</form>
+		<!-- Reset section -->
+		<section ng-controller="userReset">
+			<div id="popup" ng-show="validation.display">
+				<div class="container">
+					<div class="content">
+						<h4>{{ validation.title }}</h4>
+						<p>{{ validation.context }}</p>
+						<div class="txt-right">
+							<a ng-click="validation.display = false">OK</a>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<!-- <script src="/public/controllers/user.js"></script> -->
-		<script>
-		(function() {
-			var app = angular.module('my-app', ['ngCookies']);
+			<div id="screen">
+				<div class="container">
+					<div class="form">
+						<form ng-submit="reset()">
+							<input type="email" placeholder="Email address" ng-model="user.email" />
+							<input type="submit" value="Reset password" />
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- END Reset section -->
 
-			app.controller('userReset', function($scope, $http, $window, $cookies) {
-				$scope.user = {
-					email: 'r.ludosanu@gmail.com'
-				};
-
-				$scope.menu = {
-					display: false,
-					toggle: function() {
-						this.display = !this.display;
-					}
-				};
-
-				$scope.reset = function() {
-					console.log($scope.user);
-
-					$http({
-		        method: 'PUT',
-		        url: 'http://192.168.1.26:3000/api/user/reset',
-		        data: {
-							email: $scope.user.email
-		        }
-		      })
-		      .then((result) => {
-		        console.log(result);
-		      })
-		      .catch((error) => {
-		        console.error(error);
-		      });
-				}
-			});
-		})();
-		</script>
+		<script src="/public/controllers/user.js"></script>
 	</body>
 </html>

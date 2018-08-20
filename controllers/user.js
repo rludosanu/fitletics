@@ -17,7 +17,6 @@ module.exports = class User {
   **    Create a new user account and send an activation link.
   */
 	signup(req, res) {
-    console.log('POST /api/user/signup');
     var datas = req.body;
     var self = this;
 
@@ -31,6 +30,7 @@ module.exports = class User {
     }), (error, result) => {
       // Invalid data format
       if (error) {
+        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
@@ -40,6 +40,7 @@ module.exports = class User {
       bcrypt.hash(datas.password, 10, function(error, hash) {
         // Password encryption error
         if (error) {
+          console.error(error);
           return res.status(500).json({
             error: 'Unable to encrypt password'
           });
@@ -57,7 +58,7 @@ module.exports = class User {
           password: datas.password
         })
         .save()
-        .then((result) => {
+        .then((user) => {
           // Send the account confirmation link
           nodemailer.createTransport(self._app.config.mail).sendMail({
           	from: 'Fitletics Coach<fitleticscoach@gmail.com>',
@@ -72,7 +73,7 @@ module.exports = class User {
                 Congratulations, you are a Fitletics Coach subscriber. You have decided to lead a healthier and happier life.
               </div>
               <div style="margin-bottom: 20px;">
-                Start your Fitletics experience now by activating your account. Click on the following link <a href="http://192.168.1.26:3000/activate/${result.dataValues.activationToken}">http://192.168.1.26:3000/activate/${result.dataValues.activationToken}</a>.
+                Start your Fitletics experience now by activating your account. Click on the following link <a href="http://192.168.1.26:3000/activate/${user.dataValues.activationToken}">http://192.168.1.26:3000/activate/${user.dataValues.activationToken}</a>.
               </div>
               <div style="margin-bottom: 20px;">
                 You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
@@ -91,9 +92,12 @@ module.exports = class User {
             success: 'Congratulations, you are a Fitletics Coach subscriber. Check your emails to activate your account.'
           });
         })
-        .catch((error) => res.status(500).json({
-          error: error.parent
-        }));
+        .catch((error) => {
+          console.error(error);
+          res.status(500).json({
+            error: 'Database query error'
+          });
+        });
   		});
     });
 	}
@@ -103,7 +107,6 @@ module.exports = class User {
   **    Check user username and password and return a json web token.
   */
   signin(req, res) {
-    console.log('POST /api/user/signin');
     var datas = req.body;
     var self = this;
 
@@ -114,6 +117,7 @@ module.exports = class User {
 		}), (error, result) => {
       // Invalid data format
       if (error) {
+        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
@@ -128,12 +132,14 @@ module.exports = class User {
       .then((user) => {
         // Email not found
         if (!user) {
+          console.error('User account not found');
           return res.status(401).json({
             error: 'User account not found'
           });
         }
         // Account not activated
         else if (!user.active) {
+          console.error('User account not active');
           return res.status(403).json({
             error: 'User account not active'
           });
@@ -144,6 +150,7 @@ module.exports = class User {
         .then((match) => {
           // Passwords not matching
           if (!match) {
+            console.log('Unauthorised access');
             res.status(401).json({
               error: 'Unauthorised access'
             });
@@ -157,9 +164,19 @@ module.exports = class User {
             token: token
           });
         })
-        .catch((error) => res.status(500).json(error));
+        .catch((error) => {
+          console.error(error);
+          res.status(500).json({
+            error: 'Unable to decrypt password'
+          });
+        });
       })
-      .catch((error) => res.status(500).json(error));
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({
+          error: 'Database query error'
+        });
+      });
     });
   }
 
@@ -177,6 +194,7 @@ module.exports = class User {
     }), (error, result) => {
       // Invalid data format
       if (error) {
+        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
@@ -186,6 +204,7 @@ module.exports = class User {
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
         // Token not decrypted
         if (error) {
+          console.error(error);
           return res.status(400).json({
             error: error
           });
@@ -199,7 +218,12 @@ module.exports = class User {
           }
         })
         .then(result => res.status(200).json(result))
-        .catch(error => res.status(500).json(error));
+        .catch(error => {
+          console.error(error);
+          res.status(500).json({
+            error: 'Database query error'
+          });
+        });
       });
 		});
 	}
@@ -226,6 +250,7 @@ module.exports = class User {
     }), (error, result) => {
       // Invalid datas format
       if (error) {
+        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
@@ -235,6 +260,7 @@ module.exports = class User {
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
         // Token not decrypted
         if (error) {
+          console.error(error);
           return res.status(400).json({
             error: error
           });
@@ -252,8 +278,23 @@ module.exports = class User {
             id: decoded.id
           }
         })
-        .then(result => res.status(200).json(result))
-        .catch(error => res.status(500).json(error));
+        .then((rows) => {
+          // Token not matching user id
+          if (!rows[0]) {
+            console.error('Unauthorised session token');
+            return res.status(401).json({
+              error: 'Unauthorised session token'
+            });
+          }
+
+          res.status(200).json(result)
+        })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).json({
+            error: 'Database query error'
+          });
+        });
       });
     });
 	}
@@ -272,42 +313,53 @@ module.exports = class User {
 		}), (error, result) => {
       // Invalid datas format
       if (error) {
+        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
       }
 
       // Update database entry
-      self._app.models.user.model.update({
-				active: true,
-				activationToken: null
-			}, {
-				where: {
-					active: false,
-					activationToken: datas.token
-				}
-			})
-			.then((result) => {
-        // Token not found
-				if (!result[0]) {
+      self._app.models.user.model.findOne({
+        active: false,
+        activationToken: datas.token
+      })
+      .then((user) => {
+        if (!user) {
+          console.error('Invalid activation token');
           return res.status(401).json({
             error: 'Invalid activation token'
           });
-        }
-        // Account already activated
-        else if (result[0].active) {
-          return res.status(400).json({
+        } else if (user.active) {
+          console.error('User account already active');
+          return res.status(401).json({
             error: 'User account already active'
           });
         }
 
-        res.status(200).json({
-          success: 'User account activated'
+        user.update({
+          active: true,
+  				activationToken: null
+        })
+        .then((rows) => {
+          // OK
+          res.status(200).json({
+            success: 'User account activated'
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).json({
+            error: 'Database query error'
+          });
         });
-			})
-      .catch(error => res.status(500).json({
-        error: error.parent
-      }));
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({
+          error: 'Database query error'
+        });
+      });
     });
 	}
 
@@ -325,6 +377,7 @@ module.exports = class User {
     }), (error, result) => {
       // Invalid datas format
       if (error) {
+        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
@@ -334,6 +387,7 @@ module.exports = class User {
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
         // Token not decrypted
         if (error) {
+          console.error(error);
           return res.status(400).json({
             error: error
           });
@@ -347,8 +401,26 @@ module.exports = class User {
             id: decoded.id
           }
         })
-        .then(result => res.status(200).json(result))
-        .catch(error => res.status(500).json(error));
+        .then(rows => {
+          // Token not found
+  				if (!rows[0]) {
+            console.error('Invalid activation token');
+            return res.status(401).json({
+              error: 'Invalid activation token'
+            });
+          }
+
+          // OK
+          res.status(200).json({
+            success: 'User account deactivated'
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          res.status(500).json({
+            error: 'Database query error'
+          });
+        });
       });
     });
 	}
@@ -358,7 +430,6 @@ module.exports = class User {
   **    Reset user password and send it by email.
   */
   reset(req, res) {
-    console.log('POST /api/user/reset');
     var datas = req.body;
     var self = this;
     var generatePassword = function() {
@@ -379,6 +450,7 @@ module.exports = class User {
     }), (error, result) => {
       // Invalid data format
       if (error) {
+        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
@@ -388,6 +460,7 @@ module.exports = class User {
       bcrypt.hash(newPassword, 10, function(error, hash) {
         // Password encryption error
         if (error) {
+          console.error(error);
           return res.status(500).json({
             error: 'Unable to encrypt password'
           });
@@ -398,11 +471,13 @@ module.exports = class User {
           password: hash
         }, {
           where: {
-            username: datas.username
+            email: datas.email
           }
         })
-        .then((user) => {
-          if (!user) {
+        .then((rows) => {
+          // Email not found
+          if (!rows[0]) {
+            console.error('User account not found');
             return res.status(401).json({
               error: 'User account not found'
             });
@@ -433,11 +508,16 @@ module.exports = class User {
             `
           });
 
+          // OK
           res.status(200).json({
             success: 'Your password was reset. Check your emails to recover your new password.'
           });
         })
-        .catch((error) => res.status(500).json(error));
+        .catch((error) => {
+          res.status(500).json({
+            error: 'Database query error'
+          });
+        });
       });
     });
   }

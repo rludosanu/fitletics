@@ -16,8 +16,13 @@ a {
   text-decoration: none;
 }
 
+select, button, textarea, input {
+  font-family: 'Open Sans';
+  font-size: 15px;
+}
+
 /*
-**
+** Backgrounds
 */
 
 .bg-lightbrown {
@@ -26,4 +31,20 @@ a {
 
 .bg-blue {
   background: #3B7FF1;
+}
+
+/*
+** Text alignment
+*/
+
+.txt-left {
+  text-align: left;
+}
+
+.txt-center {
+  text-align: center;
+}
+
+.txt-right {
+  text-align: right;
 }
