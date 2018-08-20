@@ -1,6 +1,12 @@
 (function() {
   var app = angular.module('my-app', ['ngCookies']);
 
+  // Make cookies global over the domain
+  app.config(function($cookiesProvider) {
+    $cookiesProvider.defaults.path = '/';
+    $cookiesProvider.defaults.domain = '192.168.1.26';
+  });
+
   /*
   ** Signin
   */
@@ -26,22 +32,10 @@
         }
       })
       .then((result) => {
-        console.log(result);
-
-        $scope.validation = {
-          display: true,
-          title: 'Success',
-          context: result.data.token
-        };
-
-        $scope.user = {
-          username: '',
-          password: ''
-        };
+        $cookies.put('token', result.data.token);
+        $window.location.href = '/dashboard';
       })
       .catch((error) => {
-        console.error(error);
-
         $scope.validation = {
           display: true,
           title: 'Error',
@@ -49,6 +43,25 @@
         };
       });
     }
+  });
+
+  /*
+  ** Signout
+  */
+  app.controller('userSignout', function($scope, $window, $cookies) {
+    var cookies = $cookies.getAll();
+    var total = Object.keys(cookies).length;
+    var current = 0;
+
+    $scope.signout = function() {
+      angular.forEach(cookies, function (v, k) {
+        $cookies.remove(k);
+        current++;
+        if (current == total) {
+          $window.location.href = '/';
+        }
+      });
+    };
   });
 
   /*
@@ -82,8 +95,6 @@
         }
       })
       .then((result) => {
-        console.log(result);
-
         $scope.validation = {
           display: true,
           title: 'Account created',
@@ -133,8 +144,6 @@
         }
       })
       .then((result) => {
-        console.log(result);
-
         $scope.validation = {
           display: true,
           title: 'Password reset',
@@ -153,6 +162,57 @@
           title: 'Reset error',
           context: 'Internal database error or user email doesn\'t exist.'
         };
+      });
+    }
+  });
+
+  /*
+  ** Update
+  */
+  app.controller('userUpdate', function($scope, $http, $window, $cookies) {
+    $scope.user = {
+      firstName: '',
+      lastName: '',
+      username: '',
+      email: '',
+      password: ''
+    };
+
+    $http({
+      method: 'POST',
+      url: 'http://192.168.1.26:3000/api/user/read'
+    })
+    .then((result) => {
+      console.log(result);
+
+      $scope.user = {
+        firstName: result.data.firstName,
+        lastName: result.data.lastName,
+        username: result.data.username,
+        email: result.data.email
+      };
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+    $scope.update = function() {
+      $http({
+        method: 'PUT',
+        url: 'http://192.168.1.26:3000/api/user/update',
+        data: {
+          firstName: $scope.user.firstName,
+          lastName: $scope.user.lastName,
+          username: $scope.user.username,
+          email: $scope.user.email,
+          password: $scope.user.password
+        }
+      })
+      .then((result) => {
+        console.log(result.data);
+      })
+      .catch((error) => {
+        console.error(error.data.error);
       });
     }
   });

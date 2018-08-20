@@ -114,28 +114,28 @@
 		}
 	};
 
-	app.controller('index', function($scope, $cookies) {
-		var allowFullscreen = $cookies.get('allowFullscreen');
-
-		var launchFullscreen = function() {
-			document.documentElement.requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullScreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
-			document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozExitFullscreen || document.msExitFullscreen;
-			document.documentElement.requestFullscreen(document.documentElement);
-		};
-
-		$scope.allowFullscreen = allowFullscreen;
-
-		$scope.rejectFullscreen = function() {
-			$scope.allowFullscreen = false;
-			$cookies.put('allowFullscreen', false);
-		};
-
-		$scope.acceptFullscreen = function() {
-			$scope.allowFullscreen = true;
-			$cookies.put('allowFullscreen', true);
-			launchFullscreen();
-		};
-	});
+	// app.controller('index', function($scope, $cookies) {
+	// 	var allowFullscreen = $cookies.get('allowFullscreen');
+	//
+	// 	var launchFullscreen = function() {
+	// 		document.documentElement.requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullScreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
+	// 		document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozExitFullscreen || document.msExitFullscreen;
+	// 		document.documentElement.requestFullscreen(document.documentElement);
+	// 	};
+	//
+	// 	$scope.allowFullscreen = allowFullscreen;
+	//
+	// 	$scope.rejectFullscreen = function() {
+	// 		$scope.allowFullscreen = false;
+	// 		$cookies.put('allowFullscreen', false);
+	// 	};
+	//
+	// 	$scope.acceptFullscreen = function() {
+	// 		$scope.allowFullscreen = true;
+	// 		$cookies.put('allowFullscreen', true);
+	// 		launchFullscreen();
+	// 	};
+	// });
 
 	app.controller('workoutList', function($scope) {
 		var workoutNames = Object.keys(workouts);

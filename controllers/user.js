@@ -10,6 +10,8 @@ module.exports = class User {
   */
   constructor(app) {
 		this._app = app;
+
+    this.blacklistedTokens = [];
 	}
 
 	/*
@@ -156,8 +158,8 @@ module.exports = class User {
             });
           }
 
-          // Create a new json web token with 60 seconds expiration
-          var token = jwt.sign({ id: user.id }, self._app.config.jsonwebtoken.secret, { expiresIn: 60 });
+          // Create a new json web token without expiration
+          var token = jwt.sign({ id: user.id }, self._app.config.jsonwebtoken.secret);
 
           // Send back token
           res.status(200).json({
@@ -266,31 +268,52 @@ module.exports = class User {
           });
         }
 
-        // Update database entry
-        self._app.models.user.model.update({
-          firstName: datas.firstName,
-          lastName: datas.lastName,
-          username: datas.username,
-          email: datas.email,
-          password: datas.password
-        }, {
+        // Search user
+        self._app.models.user.model.findOne({
           where: {
             id: decoded.id
           }
         })
-        .then((rows) => {
-          // Token not matching user id
-          if (!rows[0]) {
-            console.error('Unauthorised session token');
+        .then((user) => {
+          // User not found
+          if (!user) {
             return res.status(401).json({
-              error: 'Unauthorised session token'
+              error: 'Invalid session token => User not found'
             });
           }
 
-          res.status(200).json(result)
+          // Compare passwords
+          bcrypt.compare(datas.password, user.dataValues.password)
+          .then((match) => {
+            // Passwords not matching
+            if (!match) {
+              res.status(401).json({
+                error: 'Invalid password => Passwords do not match'
+              });
+            }
+
+            // Update database
+            user.update({
+              firstName: datas.firstName,
+              lastName: datas.lastName,
+              username: datas.username,
+              email: datas.email
+            })
+            .then((rows) => {
+              res.status(200).json({
+                success: 'Account informations updated'
+              });
+            })
+            .catch((error) => {
+              // Update query fucked
+              res.status(500).json({
+                error: 'Database query error'
+              });
+            });
+          });
         })
+        // Find query fucked
         .catch((error) => {
-          console.error(error);
           res.status(500).json({
             error: 'Database query error'
           });

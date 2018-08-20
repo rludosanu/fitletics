@@ -1,14 +1,53 @@
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
+const jwt = require('jsonwebtoken');
+var cookieParser = require('cookie-parser');
 
 class ClientRouter {
   constructor(app) {
     this._app = app;
+
+    this.checkToken = function(req, res, next) {
+      var self = this;
+
+      if (!req.cookies || !req.cookies.token) {
+        res.redirect('/');
+      } else {
+        jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
+          if (error) {
+            res.redirect('/');
+          } else {
+            next();
+          }
+        });
+      }
+    };
+
+    this.isTokenValid = function(req, res, next) {
+      var self = this;
+
+      if (!req.cookies || !req.cookies.token) {
+        res.redirect('/');
+      } else {
+        jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
+          if (error) {
+            res.redirect('/');
+          } else {
+            next();
+          }
+        });
+      }
+    };
+
+    /* Create new Express router */
     this.router = express.Router();
 
     /* Debug */
     this.router.use(morgan('dev'));
+
+    /* Parse cookies */
+    this.router.use(cookieParser());
 
     /* Set up static files directory */
     this.router.use('/public', express.static(path.join(__dirname, '../public')));
@@ -24,23 +63,23 @@ class ClientRouter {
 
     this.router.get('/activate/:token', (req, res) => res.render('activate'));
 
-    this.router.get('/dashboard', (req, res) => res.render('dashboard'));
+    this.router.get('/dashboard', this.isTokenValid.bind(this), (req, res) => res.render('dashboard'));
 
-    this.router.get('/workout', (req, res) => res.render('workout'));
+    this.router.get('/workout', this.isTokenValid.bind(this), (req, res) => res.render('workout'));
 
-    this.router.get('/workout/:id/preview', (req, res) => res.render('workout-preview'));
+    this.router.get('/workout/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('workout-preview'));
 
-    this.router.get('/workout/:id/live', (req, res) => res.render('workout-live'));
+    this.router.get('/workout/:id/live', this.isTokenValid.bind(this), (req, res) => res.render('workout-live'));
 
-    this.router.get('/exercise', (req, res) => res.render('exercise'));
+    this.router.get('/exercise', this.isTokenValid.bind(this), (req, res) => res.render('exercise'));
 
-    this.router.get('/exercise/:id/preview', (req, res) => res.render('exercise-preview'));
+    this.router.get('/exercise/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('exercise-preview'));
 
-    this.router.get('/exercise/:id/live/:repetitions', (req, res) => res.render('exercise-live'));
+    this.router.get('/exercise/:id/live/:repetitions', this.isTokenValid.bind(this), (req, res) => res.render('exercise-live'));
 
-    this.router.get('/user/profile', (req, res) => res.render('user-profile'));
+    this.router.get('/user/profile', this.isTokenValid.bind(this), (req, res) => res.render('profile'));
 
-    this.router.get('/user/settings', (req, res) => res.render('user-settings'));
+    this.router.get('/user/settings', this.isTokenValid.bind(this), (req, res) => res.render('settings'));
 
     this.router.get('/404', (req, res) => res.render('404'));
 
@@ -69,7 +108,7 @@ class UserRouter {
     /*
     ** Get user account informations using a json web token.
     */
-    this.router.get('/read', this._app.controllers.user.read.bind(this));
+    this.router.post('/read', this._app.controllers.user.read.bind(this));
 
     /*
     ** Update user account informations using a json web token.

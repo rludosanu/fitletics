@@ -2,19 +2,13 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>MyApp User Profile</title>
-
+		<title>MyApp Settings</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
-
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
 		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
-
-		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script> -->
-		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script> -->
 
 		<style type="text/css">
 		.input-label {
@@ -27,7 +21,19 @@
 			width: 100%;
 			box-sizing: border-box;
 			background: none;
-			/* border: 1px solid white; */
+			border: none;
+			font-size: 15px;
+			padding: 8px 15px;
+			font-family: 'Open Sans';
+			outline: none;
+			color: white;
+			margin-bottom: 15px;
+		}
+
+		.submit-settings {
+			width: 100%;
+			box-sizing: border-box;
+			background: black;
 			border: none;
 			font-size: 15px;
 			padding: 8px 15px;
@@ -37,8 +43,11 @@
 			margin-bottom: 15px;
 		}
 		</style>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
-	<body ng-controller="userProfile">
+	<body ng-controller="userUpdate">
 		<div style="position: absolute; z-index: 1; top: 0px; left: 0px; width: 100%; height: calc(100% - 50px); overflow: auto;">
 			<div style="display: flex; justify-content: space-between; align-items: center; color: white; font-size: 18px; font-weight: bold; padding: 15px 15px; margin-bottom: 50px;">
 				<div>
@@ -56,16 +65,19 @@
 				</div>
 			</div>
 			<div>
-				<div class="input-label">First name</div>
-				<input type="text" placeholder="First name" ng-model="user.firstName" class="input-settings" />
-				<div class="input-label">Last name</div>
-				<input type="text" placeholder="Last name" ng-model="user.lastName" class="input-settings" />
-				<div class="input-label">Username</div>
-				<input type="text" placeholder="Username" ng-model="user.username" class="input-settings" />
-				<div class="input-label">Email address</div>
-				<input type="email" placeholder="Email address" ng-model="user.email" class="input-settings" />
-				<div class="input-label">Password</div>
-				<input type="password" placeholder="Password" ng-model="user.password" class="input-settings" />
+				<form ng-submit="update()">
+					<div class="input-label">First name</div>
+					<input type="text" placeholder="First name" ng-model="user.firstName" class="input-settings" />
+					<div class="input-label">Last name</div>
+					<input type="text" placeholder="Last name" ng-model="user.lastName" class="input-settings" />
+					<div class="input-label">Username</div>
+					<input type="text" placeholder="Username" ng-model="user.username" class="input-settings" />
+					<div class="input-label">Email address</div>
+					<input type="email" placeholder="Email address" ng-model="user.email" class="input-settings" />
+					<div class="input-label">Password</div>
+					<input type="password" placeholder="Password" ng-model="user.password" class="input-settings" />
+					<input type="submit" value="Update informations" class="submit-settings" />
+				</form>
 			</div>
     </div>
 
@@ -74,6 +86,6 @@
 			<a href="/user/profile/"><span class="fa fa-fw fa-user"></span></a>
 		</footer>
 
-		<!-- <script src="/public/controllers/workout.js"></script> -->
+		<script src="/public/controllers/user.js"></script>
 	</body>
 </html>
