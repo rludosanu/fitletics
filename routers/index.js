@@ -24,21 +24,25 @@ class ClientRouter {
       }
     };
 
-    this.isTokenValid = function(req, res, next) {
-      var self = this;
+    // this.isTokenValid = function(req, res, next) {
+    //   var self = this;
+    //
+    //   if (!req.cookies || !req.cookies.token) {
+    //     res.redirect('/');
+    //   } else {
+    //     jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
+    //       if (error) {
+    //         res.redirect('/');
+    //       } else {
+    //         next();
+    //       }
+    //     });
+    //   }
+    // };
 
-      if (!req.cookies || !req.cookies.token) {
-        res.redirect('/');
-      } else {
-        jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-          if (error) {
-            res.redirect('/');
-          } else {
-            next();
-          }
-        });
-      }
-    };
+    this.isTokenValid = function(req, res, next) {
+      next();
+    }
 
     /* Create new Express router */
     this.router = express.Router();
@@ -132,17 +136,20 @@ class UserRouter {
   }
 }
 
-class TrainingRouter {
-  constructor(app) {
-    this._app = app;
-    this.router = express.Router();
-  }
-}
-
 class WorkoutRouter {
   constructor(app) {
     this._app = app;
     this.router = express.Router();
+
+    /*
+    ** Get all workouts
+    */
+    this.router.post('/read', this._app.controllers.workout.readAll.bind(this));
+
+    /*
+    ** Get one workout
+    */
+    this.router.post('/read/:id', this._app.controllers.workout.readOne.bind(this));
   }
 }
 
@@ -150,6 +157,16 @@ class ExerciseRouter {
   constructor(app) {
     this._app = app;
     this.router = express.Router();
+
+    /*
+    ** Get all exercises
+    */
+    this.router.post('/read', this._app.controllers.exercise.readAll.bind(this));
+
+    /*
+    ** Get one exercise
+    */
+    this.router.post('/read/:id', this._app.controllers.exercise.readOne.bind(this));
   }
 }
 
@@ -159,7 +176,6 @@ class Router {
 
     this.client = new ClientRouter(app);
     this.user = new UserRouter(app);
-    this.training = new TrainingRouter(app);
     this.workout = new WorkoutRouter(app);
     this.exercise = new ExerciseRouter(app);
   }

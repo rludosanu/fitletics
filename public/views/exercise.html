@@ -28,7 +28,7 @@
     <div style="position: absolute; z-index: 1; top: 60px; left: 0px; width: 100%; height: calc(100% - 60px); overflow: auto;">
       <div>
         <div style="padding: 5px;" ng-repeat="exercise in exercises">
-					<a href="/exercise/{{ exercise.name.toLowerCase() }}/preview" style="color: white; text-decoration: none;">
+					<a href="/exercise/{{ exercise.id }}/preview" style="color: white; text-decoration: none;">
 	          <div style=" display: flex; align-items: center;">
 	            <div style="width: 45px; padding: 5px 10px 5px 5px;">
 	              <img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" style="width: 100%; display: block; border-radius: 6px;" />
@@ -40,6 +40,26 @@
       </div>
     </div>
 
-		<script src="/public/controllers/workout.js"></script>
+		<script>
+		(function() {
+			var app = angular.module('my-app', ['ngCookies']);
+
+			app.controller('exerciseList', function($scope, $http) {
+				$scope.exercises = [];
+
+				$http({
+					method: 'POST',
+					url: 'http://192.168.1.26:3000/api/exercise/read'
+				})
+				.then(result => {
+					console.log(result);
+					$scope.exercises = result.data;
+				})
+				.catch(error => {
+					console.error(error);
+				});
+			});
+		})();
+		</script>
 	</body>
 </html>

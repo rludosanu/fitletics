@@ -28,7 +28,7 @@
     <div id="list-container">
       <div id="workouts">
         <div class="layer" ng-repeat="workout in workouts">
-					<a href="/workout/{{ workout.name.toLowerCase() }}/preview">
+					<a href="/workout/{{ workout.id }}/preview">
 	          <div class="layer-content">
 	            <div class="layer-thumbnail">
 	              <img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" />
@@ -45,6 +45,26 @@
       </div>
     </div>
 
-		<script src="/public/controllers/workout.js"></script>
+		<script>
+		(function() {
+			var app = angular.module('my-app', ['ngCookies']);
+
+			app.controller('workoutList', function($scope, $http) {
+				$scope.workouts = [];
+
+				$http({
+					method: 'POST',
+					url: 'http://192.168.1.26:3000/api/workout/read'
+				})
+				.then(result => {
+					console.log(result);
+					$scope.workouts = result.data;
+				})
+				.catch(error => {
+					console.error(error);
+				});
+			});
+		})();
+		</script>
 	</body>
 </html>

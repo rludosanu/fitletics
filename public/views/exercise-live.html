@@ -64,7 +64,7 @@
 							<img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" style="width: 100%; display: block; border-radius: 6px;" />
 						</div>
 						<div style="color: white; font-size: 16px;">
-							{{ exercise.repetitions }}x {{ exercise.name }}
+							{{ exercise.volume }}x {{ exercise.name }}
 						</div>
 					</div>
 				</div>
@@ -83,6 +83,112 @@
 			{{ buttonText }}
 		</div>
 
-		<script src="/public/controllers/workout.js"></script>
+		<script>
+		(function() {
+			var app = angular.module('my-app', ['ngCookies']);
+
+			app.controller('exerciseLive', function($scope, $interval, $window, $location, $http) {
+				var url = $location.absUrl().split('/');
+				var volume = url[url.length - 1];
+				var id = url[url.length - 3];
+
+				$scope.exercise = {
+					name: '',
+					volume: volume
+				};
+
+				$scope.state = {
+					giveup: false
+				};
+
+				$scope.timer = {
+					counter: 0,
+					timer: '00:00',
+					handle: null,
+					updateHMS() {
+						var self = this;
+						var sec_num = parseInt(self.counter, 10);
+						var hours = Math.floor(sec_num / 3600);
+						var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+						var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+						if (hours < 10)
+							hours = '0' + hours;
+						if (minutes < 10)
+							minutes = '0' + minutes;
+						if (seconds < 10)
+							seconds = '0' + seconds;
+						if (hours == 0)
+							self.timer = minutes + ':' + seconds;
+						else
+							self.timer = hours + ':' + minutes + ':' + seconds;
+					},
+					start() {
+						var self = this;
+
+						if (self.handle)
+							return ;
+						self.timer = '00:00';
+						self.handle = $interval(function() {
+							self.counter += 1;
+							self.updateHMS();
+						}, 1000);
+					},
+					stop() {
+						var self = this;
+
+						$interval.cancel(self.handle);
+						self.handle = null;
+						self.counter = 0;
+					}
+				};
+
+				$scope.buttonText = 'Start';
+
+				$scope.state = {
+					state: 'waiting',
+					giveup: false,
+					fullscreen: false,
+					update() {
+						var self = this;
+
+						if (self.state == 'waiting') {
+							$scope.timer.start();
+							$scope.buttonText = 'Finish';
+							self.state = 'ongoing';
+						} else if (self.state == 'ongoing') {
+							$scope.timer.stop();
+							$window.location.href = '/exercise/';
+						}
+					},
+					toggleFullscreen() {
+						console.log('toggleFullscreen');
+						var self = this;
+
+						document.documentElement.requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullScreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
+						document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozExitFullscreen || document.msExitFullscreen;
+
+						if (self.fullscreen == true) {
+							document.exitFullscreen(document);
+							self.fullscreen = false;
+						} else {
+							document.documentElement.requestFullscreen(document.documentElement);
+							self.fullscreen = true;
+						}
+					}
+				};
+
+				$http({
+					method: 'POST',
+					url: 'http://192.168.1.26:3000/api/exercise/read/' + id
+				})
+				.then(result => {
+					console.log(result);
+					$scope.exercise.name = result.data.name;
+				})
+				.catch(error => console.error(error));
+			});
+		})();
+		</script>
 	</body>
 </html>

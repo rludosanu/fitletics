@@ -46,10 +46,10 @@ class Server {
 		this.app.use('/api/user', this.routers.user.router);
 
 		/* Workout API router */
-		// this.app.use('/api/workout', this.routers.workout.router);
+		this.app.use('/api/workout', this.routers.workout.router);
 
 		/* Exercise API router */
-		// this.app.use('/api/exercise', this.routers.exercise.router);
+		this.app.use('/api/exercise', this.routers.exercise.router);
 
 		/* Training API router */
 		// this.app.use('/api/training', this.routers.training.router);
@@ -60,7 +60,7 @@ class Server {
 
 	start() {
 		/* Connect to database */
-		// this.database.connect();
+		this.database.connect();
 
 		/* Run server */
 		this.server.listen(this.config.server.port, (error) => {

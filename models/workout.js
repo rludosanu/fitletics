@@ -15,22 +15,13 @@ module.exports = class Workout {
 			name: {
 				type: Sequelize.STRING,
 				allowNull: false,
-				required: true
-			},
-      duration: {
-				type: Sequelize.INTEGER,
-				allowNull: false,
-				required: true
-      },
-      sets: {
-      	type: Sequelize.TEXT,
-				allowNull: false,
-				required: true
-      }
+				required: true,
+				unique: true
+			}
 		});
 
-		this.model.sync({
-			force: this.reset
-		});
+		// this.model.sync({
+		// 	force: this.reset
+		// });
 	}
 }

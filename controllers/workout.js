@@ -1,8 +1,5 @@
 const joi = require('joi');
 const { Op } = require('sequelize');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
 
 module.exports = class Workout {
 	/*
@@ -12,17 +9,17 @@ module.exports = class Workout {
 		this._app = app;
 	}
 
-	/*
-  **
-  **
+  /*
+  ** readOne
+  **    Return one workout based on its id.
   */
-	read(req, res) {
-    var datas = req.cookies;
+  readOne(req, res) {
     var self = this;
+    var datas = req.params;
 
     // Validate data format
     joi.validate(datas, joi.object().keys({
-    	token: joi.string().required(),
+      id: joi.number().integer().required(),
     }), (error, result) => {
       // Invalid data format
       if (error) {
@@ -32,38 +29,98 @@ module.exports = class Workout {
         });
       }
 
-      // Check if token is not blacklisted
-      if (self.blacklistedTokens.indexOf(datas.tokens) != -1) {
-        return res.status(500).json({
-          error: 'Invalid session token'
-        });
-      }
+      self._app.models.workout.model.findOne({
+        where: {
+          id: datas.id
+        },
+        attributes: ['id', 'name'],
+        include: [{
+          model: self._app.models.round.model,
+          attributes: ['id'],
+          include: [{
+            model: self._app.models.exercise.model,
+            attributes: ['id', 'name'],
+          }]
+        }]
+      })
+      .then(workout => {
+        var datas = {};
 
-      // Decrypt json web token
-      jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        // Token not decrypted
-        if (error) {
-          console.error(error);
-          return res.status(400).json({
-            error: error
-          });
+        if (!workout) {
+          return res.status(404).json({ error: 'Workout not found' });
         }
 
-        // Read from database
-        self._app.models.user.model.findOne({
-          attributes: ['firstName', 'lastName', 'username', 'email'],
-          where: {
-            id: decoded.id
+        datas.id = workout.id;
+        datas.name = workout.name;
+        datas.rounds = [];
+
+        // Loop on rounds
+        for (var j = 0 ; j < workout.rounds.length ; j++) {
+          datas.rounds[j] = [];
+
+          // Loop on exercises
+          for (var k = 0 ; k < workout.rounds[j].exercises.length ; k++) {
+            datas.rounds[j][k] = {
+              id: workout.rounds[j].exercises[k].id,
+              name: workout.rounds[j].exercises[k].name,
+              volume: workout.rounds[j].exercises[k].roundexercise.volume
+            };
           }
-        })
-        .then(result => res.status(200).json(result))
-        .catch(error => {
-          console.error(error);
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
-      });
-		});
-	}
+        }
+
+        res.status(200).json(datas);
+      })
+      .catch(error => res.status(500).json(error));
+    });
+  }
+
+  /*
+  ** readAll
+  **    Returns all of the workouts.
+  */
+  readAll(req, res) {
+    var self = this;
+
+    self._app.models.workout.model.findAll({
+      attributes: ['id', 'name'],
+      include: [{
+        model: self._app.models.round.model,
+        attributes: ['id'],
+        include: [{
+          model: self._app.models.exercise.model,
+          attributes: ['id', 'name'],
+        }]
+      }]
+    })
+    .then(workouts => {
+      var datas = [];
+
+      // Loop on each workout
+      for (var i = 0 ; i < workouts.length ; i++) {
+        var workout = workouts[i];
+
+        datas[i] = {};
+        datas[i].id = workout.id;
+        datas[i].name = workout.name;
+        datas[i].rounds = [];
+
+        // Loop on rounds
+        for (var j = 0 ; j < workout.rounds.length ; j++) {
+          datas[i].rounds[j] = [];
+
+          // Loop on exercises
+          for (var k = 0 ; k < workout.rounds[j].exercises.length ; k++) {
+            datas[i].rounds[j][k] = {
+              id: workout.rounds[j].exercises[k].id,
+              name: workout.rounds[j].exercises[k].name,
+              volume: workout.rounds[j].exercises[k].roundexercise.volume
+            };
+          }
+        }
+      }
+
+      res.status(200).json(datas);
+    })
+    .catch(error => res.status(500).json(error));
+  }
 };

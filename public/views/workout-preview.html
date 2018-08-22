@@ -45,14 +45,14 @@
 				</div>
 			</div>
       <div id="workout-preview-body">
-        <div class="layer" ng-repeat="set in workout.sets">
+        <div class="layer" ng-repeat="round in workout.rounds">
 					<div class="layer-title">Serie {{ $index + 1 }}</div>
-					<div class="layer-content" ng-repeat="exercice in set">
+					<div class="layer-content" ng-repeat="exercice in round">
 						<div class="layer-thumbnail">
 							<img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" />
 						</div>
 						<div class="layer-infos">
-							<div class="repetition">{{ exercice.repetition }}x {{ exercice.name }}</div>
+							<div class="repetition">{{ exercice.volume }}x {{ exercice.name }}</div>
 						</div>
 					</div>
         </div>
@@ -60,11 +60,34 @@
     </div>
 
 		<footer id="footer" class="bg-blue">
-			<a href="/workout/{{ workout.name.toLowerCase() }}/live">
+			<a href="/workout/{{ workout.id }}/live">
 				Start
 			</a>
 		</footer>
 
-		<script src="/public/controllers/workout.js"></script>
+		<script>
+		(function() {
+			var app = angular.module('my-app', ['ngCookies']);
+
+			app.controller('workoutPreview', function($scope, $http, $location) {
+				var url = $location.absUrl().split('/');
+				var id = url[url.length - 2];
+
+				$scope.workout = [];
+
+				$http({
+					method: 'POST',
+					url: 'http://192.168.1.26:3000/api/workout/read/' + id
+				})
+				.then(result => {
+					console.log(result);
+					$scope.workout = result.data;
+				})
+				.catch(error => {
+					console.error(error);
+				});
+			});
+		})();
+		</script>
 	</body>
 </html>

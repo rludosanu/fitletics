@@ -31,24 +31,16 @@
 					<table>
 						<tr>
 							<td><span class="fa fa-fw fa-rub"></span>&nbsp;Points</td>
-							<td>{{ exercise.points * repetitions }}</td>
+							<td>{{ exercise.points * volume }}</td>
 						</tr>
 						<tr>
 							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Difficulty</td>
 							<td>{{ exercise.difficulty }}</td>
 						</tr>
 						<tr>
-							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Equipment</td>
-							<td>{{ exercise.equipment }}</td>
-						</tr>
-						<tr>
-							<td><span class="fa fa-fw fa-dot-circle-o"></span>&nbsp;Body target</td>
-							<td>{{ exercise.body }}</td>
-						</tr>
-						<tr>
 							<td><span class="fa fa-fw fa-signal"></span>&nbsp;Repetitions</td>
 							<td>
-								<select style="background: none; border: none; color: white; font-size: 14px; padding: 0px; margin: 0px; text-align: right;" ng-model="repetitions">
+								<select style="background: none; border: none; color: white; font-size: 14px; padding: 0px; margin: 0px; text-align: right;" ng-model="volume">
 									<option value="10">10</option>
 									<option value="25">25</option>
 									<option value="50">50</option>
@@ -64,11 +56,46 @@
 		</div>
 
 		<footer id="footer" class="bg-blue">
-			<a href="/exercise/{{ exercise.name.toLowerCase() }}/live/{{ repetitions }}">
+			<a href="/exercise/{{ exercise.id }}/live/{{ volume }}">
 				Start
 			</a>
 		</footer>
 
-		<script src="/public/controllers/workout.js"></script>
+		<script>
+		(function() {
+			var app = angular.module('my-app', ['ngCookies']);
+
+			app.controller('exercisePreview', function($scope, $http, $location) {
+				var url = $location.absUrl().split('/');
+				var id = url[url.length - 2];
+
+				$scope.exercise = {
+					id: -1,
+					name: '',
+					difficulty: '',
+					points: 0
+				};
+
+				$http({
+					method: 'POST',
+					url: 'http://192.168.1.26:3000/api/exercise/read/' + id
+				})
+				.then(result => {
+					console.log(result);
+					$scope.exercise = result.data;
+					if ($scope.exercise.points < 4) {
+						$scope.exercise.difficulty = 'Easy';
+					} else if ($scope.exercise.points >= 4 && $scope.exercise.points <= 6) {
+						$scope.exercise.difficulty = 'Medium';
+					} else {
+						$scope.exercise.difficulty = 'Hard';
+					}
+				})
+				.catch(error => {
+					console.error(error);
+				});
+			});
+		})();
+		</script>
 	</body>
 </html>
