@@ -8,6 +8,19 @@
   });
 
   /*
+  ** Index
+  */
+  app.controller('userIndex', function($scope, $window) {
+    $scope.signup = function() {
+      $window.location.href = '/signup';
+    };
+
+    $scope.signin = function() {
+      $window.location.href = '/signin';
+    };
+  });
+
+  /*
   ** Signin
   */
   app.controller('userSignin', function($scope, $http, $window, $cookies) {
@@ -20,6 +33,10 @@
       display: false,
       title: '',
       context: ''
+    };
+
+    $scope.reset = function() {
+      $window.location.href = '/reset';
     };
 
     $scope.signin = function() {
@@ -46,25 +63,6 @@
   });
 
   /*
-  ** Signout
-  */
-  app.controller('userSignout', function($scope, $window, $cookies) {
-    var cookies = $cookies.getAll();
-    var total = Object.keys(cookies).length;
-    var current = 0;
-
-    $scope.signout = function() {
-      angular.forEach(cookies, function (v, k) {
-        $cookies.remove(k);
-        current++;
-        if (current == total) {
-          $window.location.href = '/';
-        }
-      });
-    };
-  });
-
-  /*
   ** Signup
   */
   app.controller('userSignup', function($scope, $http, $window) {
@@ -80,6 +78,10 @@
       display: false,
       title: '',
       context: ''
+    };
+
+    $scope.signin = function() {
+      $window.location.href = '/signin';
     };
 
     $scope.signup = function() {
@@ -167,9 +169,43 @@
   });
 
   /*
+  ** Activate
+  */
+  app.controller('userActivate', function($scope, $http, $window, $location, $cookies) {
+    var url = $location.absUrl().split('/');
+    var token = url[url.length - 1];
+
+    $scope.validation = {
+      success: false,
+      error: false
+    };
+
+    $http({
+      method: 'PUT',
+      url: 'http://192.168.1.26:3000/api/user/activate',
+      data: {
+        token: token
+      }
+    })
+    .then((result) => {
+      $scope.validation = {
+        success: true,
+        error: false
+      };
+    })
+    .catch((error) => {
+      $scope.validation = {
+        success: false,
+        error: true
+      };
+    });
+  });
+
+  /*
   ** Update
   */
   app.controller('userUpdate', function($scope, $http, $window, $cookies) {
+    // User datas
     $scope.user = {
       firstName: '',
       lastName: '',
@@ -178,13 +214,19 @@
       password: ''
     };
 
+    // Validation feedback popup
+    $scope.validation = {
+      display: false,
+      title: '',
+      context: ''
+    };
+
+    // Request user datas
     $http({
       method: 'POST',
       url: 'http://192.168.1.26:3000/api/user/read'
     })
     .then((result) => {
-      console.log(result);
-
       $scope.user = {
         firstName: result.data.firstName,
         lastName: result.data.lastName,
@@ -193,9 +235,14 @@
       };
     })
     .catch((error) => {
-      console.error(error);
+      $scope.validation = {
+        display: true,
+        title: 'Error',
+        context: error.data.error
+      };
     });
 
+    // Send user datas
     $scope.update = function() {
       $http({
         method: 'PUT',
@@ -209,23 +256,57 @@
         }
       })
       .then((result) => {
-        console.log(result.data);
+        $scope.validation = {
+          display: true,
+          title: 'All good',
+          context: 'Your personal account informations have been saved.'
+        };
+        $scope.user.password = '';
       })
       .catch((error) => {
         console.error(error.data.error);
+        $scope.validation = {
+          display: true,
+          title: 'Oops...',
+          context: error.data.error
+        };
       });
     }
   });
 
   /*
-  ** Toggle menu
+  ** Get informations and trainings
   */
-  app.controller('userMenu', function($scope) {
-    $scope.menu = {
-      display: false,
-      toggle: function() {
-        this.display = !this.display;
-      }
+  app.controller('userProfile', function($scope, $http, $cookies, $window) {
+    $scope.trainings = [];
+    $scope.countTrainings = 0;
+
+    // Fetch trainings from database
+    $http({
+      method: 'POST',
+      url: 'http://192.168.1.26:3000/api/training/read'
+    })
+    .then((result) => {
+      $scope.trainings = result.data;
+      $scope.countTrainings = $scope.trainings.length;
+    })
+    .catch((error) => {
+      console.error(error.data.error);
+    });
+
+    // Sign out from current session and removes all cookies
+    $scope.signout = function() {
+      var cookies = $cookies.getAll();
+      var total = Object.keys(cookies).length;
+      var current = 0;
+
+      angular.forEach(cookies, function (v, k) {
+        $cookies.remove(k);
+        current++;
+        if (current == total) {
+          $window.location.href = '/';
+        }
+      });
     };
   });
 })();

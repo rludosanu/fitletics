@@ -2,7 +2,7 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>Fitletics Reset Password</title>
+		<title>Reset Password</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
@@ -13,44 +13,22 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
 	<body>
-		<section ng-controller="userMenu">
-			<!-- Navigation -->
-			<header id="navigation">
-				<div class="item">
-					<a href="/">
-						<span class="fa fa-fw fa-circle-o-notch"></span>
-					</a>
-				</div>
-				<div class="item title">
-					Fitletics
-				</div>
-				<div class="item" ng-click="menu.toggle()">
-					<span class="fa fa-fw" ng-class="{'fa-bars': !menu.display, 'fa-times': menu.display}"></span>
-				</div>
-			</header>
-			<!-- END Navigation -->
-
-			<!-- Side menu -->
-			<aside id="menu" ng-show="menu.display">
-				<ul>
-					<ul>
-						<a href="/signin">
-							<li>Sign in</li>
-						</a>
-						<a href="/signup">
-							<li>Sign up</li>
-						</a>
-						<a href="/reset">
-							<li>Reset password</li>
-						</a>
-					</ul>
-				</ul>
-			</aside>
-			<!-- END Side menu -->
-		</section>
+		<!-- Navigation -->
+		<header id="navigation">
+			<div class="item">
+				<a href="/signin">
+					<span class="fa fa-fw fa-arrow-left"></span>
+				</a>
+			</div>
+			<div class="item">
+				Reset password
+			</div>
+		</header>
+		<!-- END Navigation -->
 
 		<!-- Reset section -->
 		<section ng-controller="userReset">
+			<!-- Popup -->
 			<div id="popup" ng-show="validation.display">
 				<div class="container">
 					<div class="content">
@@ -62,17 +40,26 @@
 					</div>
 				</div>
 			</div>
+			<!-- END Popup -->
 
+			<!-- Screen -->
 			<div id="screen">
-				<div class="container">
+				<div id="screen-container">
 					<div class="form">
+						<div class="description">Enter the email address you used at sign up to generate a new password.</div>
 						<form ng-submit="reset()">
-							<input type="email" placeholder="Email address" ng-model="user.email" />
-							<input type="submit" value="Reset password" />
+							<div class="row">
+								<div class="label">Email address</div>
+								<div class="input"><input type="email" placeholder="Email address" ng-model="user.email" /></div>
+							</div>
+							<div class="row">
+								<input type="submit" value="Reset password" />
+							</div>
 						</form>
 					</div>
 				</div>
 			</div>
+			<!-- END Screen -->
 		</section>
 		<!-- END Reset section -->
 

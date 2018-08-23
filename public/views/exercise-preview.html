@@ -2,100 +2,54 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>MyApp Home</title>
-
+		<title>Exercise Preview</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
-
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
-
+		<link rel="stylesheet" href="/public/stylesheets/logged.css" type="text/css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
   <body ng-controller="exercisePreview">
-    <header id="header">
-      <div class="layer">
+		<!-- Navigation -->
+		<header id="navigation">
+			<div class="item">
 				<a href="/exercise">
-        	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;{{ exercise.name }}
+					<span class="fa fa-fw fa-arrow-left"></span>
 				</a>
-      </div>
-    </header>
+			</div>
+			<div class="item">
+				{{ exercise.name }}
+			</div>
+		</header>
+		<!-- END Navigation -->
 
-		<div style="position: absolute; z-index: 1; top: 60px; left: 0px; width: 100%; height: calc(100% - 110px); overflow: auto;">
-			<div id="workout-preview-header">
-				<div class="content">
-					<table>
-						<tr>
-							<td><span class="fa fa-fw fa-rub"></span>&nbsp;Points</td>
-							<td>{{ exercise.points * volume }}</td>
-						</tr>
-						<tr>
-							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Difficulty</td>
-							<td>{{ exercise.difficulty }}</td>
-						</tr>
-						<tr>
-							<td><span class="fa fa-fw fa-signal"></span>&nbsp;Repetitions</td>
-							<td>
-								<select style="background: none; border: none; color: white; font-size: 14px; padding: 0px; margin: 0px; text-align: right;" ng-model="volume">
-									<option value="10">10</option>
-									<option value="25">25</option>
-									<option value="50">50</option>
-									<option value="100">100</option>
-									<option value="150">150</option>
-									<option value="200">200</option>
-								</select>
-							</td>
-						</tr>
-					</table>
+		<!-- Screen -->
+		<div id="screen-cropped">
+			<div id="screen-container">
+				<div id="exercise-preview">
+					<div class="points">
+						{{ exercise.points * volume }} points
+					</div>
+					<div class="title">
+						Enter the number of repetitions you aim and hit the start button.
+					</div>
+					<div class="volume">
+						<input type="text" placeholder="Number of repetitions" ng-model="volume" />
+					</div>
 				</div>
 			</div>
 		</div>
+		<!-- END Screen -->
 
-		<footer id="footer" class="bg-blue">
-			<a href="/exercise/{{ exercise.id }}/live/{{ volume }}">
-				Start
-			</a>
+		<!-- Footer -->
+		<footer id="footer">
+			<button ng-click="start()">Start exercise</button>
 		</footer>
+		<!-- END Footer -->
 
-		<script>
-		(function() {
-			var app = angular.module('my-app', ['ngCookies']);
-
-			app.controller('exercisePreview', function($scope, $http, $location) {
-				var url = $location.absUrl().split('/');
-				var id = url[url.length - 2];
-
-				$scope.exercise = {
-					id: -1,
-					name: '',
-					difficulty: '',
-					points: 0
-				};
-
-				$http({
-					method: 'POST',
-					url: 'http://192.168.1.26:3000/api/exercise/read/' + id
-				})
-				.then(result => {
-					console.log(result);
-					$scope.exercise = result.data;
-					if ($scope.exercise.points < 4) {
-						$scope.exercise.difficulty = 'Easy';
-					} else if ($scope.exercise.points >= 4 && $scope.exercise.points <= 6) {
-						$scope.exercise.difficulty = 'Medium';
-					} else {
-						$scope.exercise.difficulty = 'Hard';
-					}
-				})
-				.catch(error => {
-					console.error(error);
-				});
-			});
-		})();
-		</script>
+		<script src="/public/controllers/exercise.js"></script>
 	</body>
 </html>

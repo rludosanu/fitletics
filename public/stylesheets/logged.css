@@ -1,0 +1,342 @@
+/*
+** Dashboard
+*/
+
+#dashboard .layer {
+  display: flex;
+  height: 180px;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: 8px;
+}
+
+#dashboard .layer-content {
+  padding: 25px;
+}
+
+#dashboard .layer h2,
+#dashboard .layer p {
+  width: 60%;
+}
+
+#dashboard .layer h2 {
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  line-height: 28px;
+  text-transform: uppercase;
+  margin: 0px 0px 15px 0px;
+  padding: 0px;
+}
+
+#dashboard .layer p {
+  font-size: 13px;
+  color: white;
+  margin: 0px 0px 0px 0px;
+  padding: 0px;
+}
+
+#dashboard .layer-workouts {
+  background-image: url('https://images.pexels.com/photos/414029/pexels-photo-414029.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+}
+
+#dashboard .layer-coach {
+  background-image: url('https://images.pexels.com/photos/28054/pexels-photo-28054.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+}
+
+#dashboard .layer-individuals {
+  background-image: url('https://images.pexels.com/photos/28061/pexels-photo.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+}
+
+#dashboard .layer-locations {
+  background-image: url('https://images.pexels.com/photos/28076/pexels-photo.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+}
+
+/*
+** Workouts / Exercises
+*/
+
+#workouts .layer,
+#exercises .layer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+#workouts .layer-thumbnail,
+#exercises .layer-thumbnail {
+  margin-right: 15px;
+}
+
+#workouts .layer-thumbnail {
+  width: 80px;
+}
+
+#exercises .layer-thumbnail {
+  width: 60px;
+}
+
+#workouts .layer-thumbnail img,
+#exercises .layer-thumbnail img {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+}
+
+#workouts .layer-infos,
+#exercises .layer-infos {
+  color: white;
+  text-transform: capitalize;
+}
+
+#exercises .layer-infos {
+  font-size: 15px;
+}
+
+#workouts .layer-infos .name {
+  font-size: 17px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+#workouts .layer-infos .rounds {
+  font-size: 13px;
+}
+
+/*
+** Workout preview
+*/
+
+#workout-preview .layer {
+  margin-bottom: 20px;
+}
+
+#workout-preview .layer:last-of-type {
+  margin-bottom: 0px;
+}
+
+#workout-preview .layer .title {
+  font-size: 13px;
+  color: #F9F8F6;
+  margin-bottom: 10px;
+}
+
+#workout-preview .layer .content {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#workout-preview .layer .thumbnail {
+  width: 45px;
+  margin-right: 10px;
+}
+
+#workout-preview .layer .thumbnail img {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+}
+
+#workout-preview .layer .volume {
+  color: white;
+  font-size: 15px;
+}
+
+/*
+** Exercise preview
+*/
+
+#exercise-preview .points {
+  font-size: 30px;
+  color: #3B7FF1;
+  margin: 15px 0px 25px 0px;
+}
+
+#exercise-preview .title {
+  font-size: 15px;
+  color: #F9F8F6;
+  margin: 0px 0px 25px 0px;
+}
+
+#exercise-preview input {
+  width: 100%;
+  box-sizing: border-box;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid #292929;
+  outline: none;
+  font-size: 15px;
+  color: white;
+  background: none;
+  font-family: 'Open Sans';
+  padding: 12px 0px;
+}
+
+/*
+** Training live
+*/
+
+#training-timer {
+   padding: 25px 0px;
+   text-align: center;
+   font-size: 60px;
+   color: white;
+}
+
+#training-chart {
+  margin-bottom: 15px;
+  display: flex;
+}
+
+#training-chart .round {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  width: 100%;
+  margin-right: 5px;
+}
+
+#training-chart .round:last-of-type {
+  margin-right: 0px;
+}
+
+#training-chart .round .bar {
+  flex-grow: 1;
+  margin: 0px 3px;
+}
+
+#training-progress {
+  margin-bottom: 25px;
+}
+
+#training-progress .back,
+#training-progress .front,
+#training-progress .number {
+  height: 24px;
+}
+
+#training-progress .back {
+  background: #292929;
+}
+
+#training-progress .front {
+  background: #3B7FF1;
+  margin-top: -24px;
+}
+
+#training-progress .number {
+  margin-top: -24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+#training-exercise {
+  margin-bottom: 25px;
+  text-transform: capitalize;
+}
+
+#training-exercise .title {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+#training-exercise .content {
+  display: flex;
+  align-items: center;
+}
+
+#training-exercise .content .icon {
+  width: 50px;
+  margin-right: 15px;
+}
+
+#training-exercise .content .icon img {
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+}
+
+#training-exercise .content .detail {
+  color: white;
+  font-size: 16px;
+}
+
+#training-message {
+  margin-bottom: 25px;
+  color: white;
+  font-size: 16px;
+  text-align: center;
+}
+
+/*
+** Profile
+*/
+
+#profile-logo {
+  width: 120px;
+  margin: 25px auto 25px auto;
+}
+
+#profile-logo img {
+  width: 100%;
+  border-radius: 999px;
+  display: block;
+}
+
+#profile-statistics {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: white;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+#profile-statistics .item {
+  text-align: center;
+}
+
+#profile-statistics .item .number {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+#profile-statistics .item .caption {
+  font-size: 12px;
+  color: #C7C6C4;
+}
+
+#profile-trainings {
+  margin-bottom: 5px;
+}
+
+#profile-trainings .container {
+  padding: 25px 0px;
+  text-transform: capitalize;
+  border-bottom: 1px solid #292929;
+}
+
+#profile-trainings .container .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #C7C6C4;
+  margin-bottom: 8px;
+}
+
+#profile-trainings .container .body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17px;
+  color: white;
+}

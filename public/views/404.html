@@ -2,35 +2,37 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>MyApp Page Not Found</title>
-
+		<title>Page Not Found</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
-
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
-
-		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (min-width: 600px) and (max-width: 768px)" href="/public/stylesheets/s-screen.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (min-width: 768px) and (max-width: 992px)" href="/public/stylesheets/m-screen.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (min-width: 992px) and (max-width: 1600px)" href="/public/stylesheets/l-screen.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (min-width: 1600px)" href="/public/stylesheets/xl-screen.css" type="text/css" />
-
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
+		<link rel="stylesheet" href="/public/stylesheets/unlogged.css" type="text/css" />
 	</head>
 	<body>
-		<header id="header">
-			<!-- content -->
+		<!-- Navigation -->
+		<header id="navigation">
+			<div class="item">
+				<a href="/">
+					<span class="fa fa-fw fa-arrow-left"></span>
+				</a>
+			</div>
+			<div class="item">
+				Page not found
+			</div>
 		</header>
+		<!-- END Navigation -->
 
-		<div id="container">
-			<!-- content -->
+		<!-- Screen -->
+		<div id="screen">
+			<div id="screen-container">
+				<div id="notfound">
+					<div class="title">404</div>
+					<div class="context">The page you requested cannot be found or doesn't exist anymore. Please go back to homepage.</div>
+				</div>
+			</div>
 		</div>
-
-		<footer id="footer">
-			<!-- content -->
-		</footer>
+		<!-- END Screen -->
 	</body>
 </html>

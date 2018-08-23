@@ -22,9 +22,5 @@ module.exports = class Roundexercise {
         defaultValue: 10
       }
     });
-
-    // this.model.sync({
-		// 	force: this.reset
-		// });
 	}
 }

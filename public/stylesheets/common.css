@@ -22,18 +22,6 @@ select, button, textarea, input {
 }
 
 /*
-** Backgrounds
-*/
-
-.bg-lightbrown {
-  background: #292929;
-}
-
-.bg-blue {
-  background: #3B7FF1;
-}
-
-/*
 ** Text alignment
 */
 
@@ -47,4 +35,220 @@ select, button, textarea, input {
 
 .txt-right {
   text-align: right;
+}
+
+/*
+** Navigation
+*/
+
+#navigation {
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: calc(60px);
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  color: white;
+  background: #292929;
+  margin-bottom: 25px;
+  box-shadow: 0px 0px 10px black;
+}
+
+#navigation .item {
+  padding: 0px 15px;
+  text-transform: capitalize;
+}
+
+#navigation .item a {
+  color: white;
+  text-decoration: none;
+}
+
+#navigation .item:nth-of-type(2) {
+  flex-grow: 1;
+}
+
+/*
+** Footer
+*/
+
+#footer {
+  position: absolute;
+  z-index: 1;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 60px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 20px;
+}
+
+#footer button {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  color: white;
+  background: #3B7FF1;
+  font-size: 15px;
+  outline: none;
+  border: none;
+}
+
+/*
+** Popup
+*/
+
+#popup {
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+#popup .container {
+  padding: 25px;
+  width: 100%;
+}
+
+#popup .container .content {
+  background: white;
+  padding: 25px 15px;
+}
+
+#popup .container .content h4 {
+  margin: 0px 0px 5px 0px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+#popup .container .content p {
+  margin: 0px 0px 25px 0px;
+  font-size: 15px;
+}
+
+#popup .container .content a {
+  color: #3B7FF1;
+  font-size: 15px;
+  margin: 0px 10px;
+}
+
+/*
+** Screen
+*/
+
+#screen {
+  position: absolute;
+  z-index: 1;
+  top: 60px;
+  left: 0px;
+  width: 100%;
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
+
+#screen-full {
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#screen-cropped {
+  position: absolute;
+  z-index: 1;
+  top: 60px;
+  left: 0px;
+  width: 100%;
+  height: calc(100% - 120px);
+  overflow-y: auto;
+}
+
+#screen-container {
+  padding: 15px;
+}
+
+#screen-container .form .description {
+  color: white;
+  font-size: 17px;
+  margin: 15px 0px 25px 0px;
+}
+
+#screen-container .form .context {
+  color: white;
+  font-size: 15px;
+  margin-bottom: 25px;
+}
+
+#screen-container .form .row {
+  margin-bottom: 20px;
+}
+
+#screen-container .form .row .label {
+  font-size: 12px;
+  color: #C7C6C4;
+}
+
+#screen-container .form .error {
+  font-size: 12px;
+  color: white;
+}
+
+#screen-container .form .input {
+  margin-bottom: 5px;
+}
+
+#screen .form input[type="text"],
+#screen .form input[type="email"],
+#screen .form input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid #292929;
+  outline: none;
+  color: white;
+  background: none;
+  font-family: 'Open Sans';
+  padding: 12px 0px;
+}
+
+#screen .form input[type="button"],
+#screen .form input[type="submit"] {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #292929;
+  color: white;
+  background: #292929;
+  font-family: 'Open Sans';
+  padding: 15px 0px;
+  outline: none;
+  box-shadow: 0px 0px 10px black;
+}
+
+#screen .extras input[type="button"] {
+	width: 100%;
+	box-sizing: border-box;
+	font-family: 'Open Sans';
+	padding: 20px 0px;
+	border: none;
+	color: white;
+	outline: none;
+	background: none;
 }

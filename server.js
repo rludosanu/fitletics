@@ -52,7 +52,7 @@ class Server {
 		this.app.use('/api/exercise', this.routers.exercise.router);
 
 		/* Training API router */
-		// this.app.use('/api/training', this.routers.training.router);
+		this.app.use('/api/training', this.routers.training.router);
 
 		/* Server */
 		this.server = http.createServer(this.app);

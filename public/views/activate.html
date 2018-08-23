@@ -2,175 +2,49 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>Fitletics Activate</title>
-    <meta charset="utf-8" />
+		<title>Account Activation</title>
+		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-		<style type="text/css">
-		html {
-		  background: #151515;
-		}
-
-		body {
-		  margin: 0px;
-		  padding: 0px;
-		  font-family: 'Open Sans';
-		}
-
-		a {
-		  text-decoration: none;
-		}
-
-		#navigation {
-			height: calc(60px);
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			font-size: 22px;
-			color: white;
-			background: #292929;
-			margin-bottom: 25px;
-		}
-
-		#navigation .item {
-			padding: 0px 15px;
-		}
-
-		#navigation .item a {
-			color: white;
-			text-decoration: none;
-		}
-
-		#navigation .title {
-			font-weight: bold;
-		}
-
-		#screen {
-			position: absolute;
-			z-index: 1;
-			top: 60px;
-			left: 0px;
-			width: 100%;
-			display: flex;
-			align-items: center;
-			height: calc(100% - 60px);
-		}
-
-		#screen .container {
-			padding: 15px;
-			text-align: center;
-		}
-
-		#screen .container .title {
-			color: white;
-			font-size: 22px;
-			margin-bottom: 25px;
-		}
-
-		#screen .container .context {
-			color: white;
-			font-size: 16px;
-			margin-bottom: 50px;
-		}
-
-		#screen .container .button input {
-			width: 100%;
-			box-sizing: border-box;
-			border: 1px solid #292929;
-			font-size: 15px;
-			color: white;
-			background: #292929;
-			font-family: 'Open Sans';
-			padding: 15px 10px;
-			margin-bottom: 25px;
-			outline: none;
-		}
-		</style>
+		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
 	<body ng-controller="userActivate">
-		<div id="navigation">
+		<!-- Navigation -->
+		<header id="navigation">
 			<div class="item">
-				<a href="/">
-					<span class="fa fa-fw fa-circle-o-notch"></span>
+				<a href="/signin">
+					<span class="fa fa-fw fa-arrow-left"></span>
 				</a>
 			</div>
-			<div class="item title">
-				Fitletics
-			</div>
 			<div class="item">
-				<span class="fa fa-fw fa-bars"></span>
+				Account activation
 			</div>
-		</div>
+		</header>
+		<!-- END Navigation -->
 
+		<!-- Screen -->
 		<div id="screen">
-			<div class="container">
-				<div ng-show="validation.success">
-					<div class="title">
-						Account activated
-					</div>
+			<div id="screen-container">
+				<div class="form" ng-show="validation.success">
+					<div class="description">Account activated</div>
 					<div class="context">
 						Congratulations, you are now officially a Fitletics Coach member. Sign in to start your very first workout.
 					</div>
-					<div class="button">
-						<input type="button" value="Sign in" ng-click="signin()" />
-					</div>
 				</div>
 
-				<div ng-show="validation.error">
-					<div class="title">
-						Activation error
-					</div>
+				<div class="form" ng-show="validation.error">
+					<div class="description">Activation error</div>
 					<div class="context">
 						Oops... something went wrong. Are you sure about that token ?
 					</div>
 				</div>
 			</div>
 		</div>
+		<!-- END Screen -->
 
-		<!-- <script src="/public/controllers/user.js"></script> -->
-		<script>
-		(function() {
-			var app = angular.module('my-app', ['ngCookies']);
-
-			app.controller('userActivate', function($scope, $http, $window, $location, $cookies) {
-				var url = $location.absUrl().split('/');
-				var token = url[url.length - 1];
-
-				$scope.validation = {
-					success: false,
-					error: false
-				};
-
-				$scope.signin = function() {
-					$window.location.href = '/signin';
-				};
-
-				$http({
-	        method: 'PUT',
-	        url: 'http://192.168.1.26:3000/api/user/activate',
-	        data: {
-						token: token
-	        }
-	      })
-	      .then((result) => {
-	        console.log(result);
-					$scope.validation = {
-						success: true,
-						error: false
-					};
-	      })
-	      .catch((error) => {
-	        console.error(error);
-					$scope.validation = {
-						success: false,
-						error: true
-					};
-	      });
-      });
-		})();
-		</script>
+		<script src="/public/controllers/user.js"></script>
 	</body>
 </html>

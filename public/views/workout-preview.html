@@ -2,92 +2,66 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>MyApp Home</title>
-
+		<title>Workout Preview</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
-
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
-
+		<link rel="stylesheet" href="/public/stylesheets/logged.css" type="text/css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
   <body ng-controller="workoutPreview">
-    <header id="header">
-      <div class="layer">
+		<!-- Navigation -->
+		<header id="navigation">
+			<div class="item">
 				<a href="/workout">
-        	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;{{ workout.name }}
+					<span class="fa fa-fw fa-arrow-left"></span>
 				</a>
-      </div>
-    </header>
-
-    <div id="preview-container">
-			<div id="workout-preview-header">
-				<div class="content">
-					<table>
-						<tr>
-							<td><span class="fa fa-fw fa-bolt"></span>&nbsp;Equipment</td>
-							<td>{{ workout.equipment }}</td>
-						</tr>
-						<tr>
-							<td><span class="fa fa-fw fa-clock-o"></span>&nbsp;Avg. Duration</td>
-							<td>{{ workout.duration }}</td>
-						</tr>
-						<tr>
-							<td><span class="fa fa-fw fa-star"></span>&nbsp;Personal Best</td>
-							<td>43:51</td>
-						</tr>
-					</table>
-				</div>
 			</div>
-      <div id="workout-preview-body">
-        <div class="layer" ng-repeat="round in workout.rounds">
-					<div class="layer-title">Serie {{ $index + 1 }}</div>
-					<div class="layer-content" ng-repeat="exercice in round">
-						<div class="layer-thumbnail">
-							<img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" />
-						</div>
-						<div class="layer-infos">
-							<div class="repetition">{{ exercice.volume }}x {{ exercice.name }}</div>
-						</div>
+			<div class="item">
+				{{ workout.name }}
+			</div>
+		</header>
+		<!-- END Navigation -->
+
+		<!-- Screen -->
+		<div id="screen-cropped">
+			<div id="screen-container">
+				<!-- Chart -->
+				<div id="training-chart">
+					<div class="round" ng-repeat="round in workout.rounds">
+						<div class="bar" ng-repeat="exercise in round" style="height: {{ exercise.volume * barchart.maxHeight / barchart.maxVolume }}px; background: #3B7FF1;">&nbsp;</div>
 					</div>
-        </div>
-      </div>
-    </div>
+				</div>
+				<!-- END Chart -->
 
-		<footer id="footer" class="bg-blue">
-			<a href="/workout/{{ workout.id }}/live">
-				Start
-			</a>
+				<!-- Preview -->
+	      <div id="workout-preview">
+	        <div class="layer" ng-repeat="round in workout.rounds">
+						<div class="title">Round {{ $index + 1 }}</div>
+						<div class="content" ng-repeat="exercice in round">
+							<div class="thumbnail">
+								<img src="/public/images/logo.png" />
+							</div>
+							<div class="volume">
+								{{ exercice.volume }}x {{ exercice.name }}
+							</div>
+						</div>
+	        </div>
+	      </div>
+				<!-- END Preview -->
+			</div>
+		</div>
+		<!-- END Screen -->
+
+		<!-- Footer -->
+		<footer id="footer">
+			<button ng-click="start()">Start workout</button>
 		</footer>
+		<!-- END Footer -->
 
-		<script>
-		(function() {
-			var app = angular.module('my-app', ['ngCookies']);
-
-			app.controller('workoutPreview', function($scope, $http, $location) {
-				var url = $location.absUrl().split('/');
-				var id = url[url.length - 2];
-
-				$scope.workout = [];
-
-				$http({
-					method: 'POST',
-					url: 'http://192.168.1.26:3000/api/workout/read/' + id
-				})
-				.then(result => {
-					console.log(result);
-					$scope.workout = result.data;
-				})
-				.catch(error => {
-					console.error(error);
-				});
-			});
-		})();
-		</script>
+		<script src="/public/controllers/workout.js"></script>
 	</body>
 </html>

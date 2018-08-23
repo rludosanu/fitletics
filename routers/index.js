@@ -24,25 +24,22 @@ class ClientRouter {
       }
     };
 
-    // this.isTokenValid = function(req, res, next) {
-    //   var self = this;
-    //
-    //   if (!req.cookies || !req.cookies.token) {
-    //     res.redirect('/');
-    //   } else {
-    //     jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-    //       if (error) {
-    //         res.redirect('/');
-    //       } else {
-    //         next();
-    //       }
-    //     });
-    //   }
-    // };
-
+    /* Valid session token */
     this.isTokenValid = function(req, res, next) {
-      next();
-    }
+      var self = this;
+
+      if (!req.cookies || !req.cookies.token) {
+        res.redirect('/');
+      } else {
+        jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
+          if (error) {
+            res.redirect('/');
+          } else {
+            next();
+          }
+        });
+      }
+    };
 
     /* Create new Express router */
     this.router = express.Router();
@@ -58,35 +55,20 @@ class ClientRouter {
 
     /* Set up routing */
     this.router.get('/', (req, res) => res.render('index'));
-
     this.router.get('/signin', (req, res) => res.render('signin'));
-
     this.router.get('/signup', (req, res) => res.render('signup'));
-
     this.router.get('/reset', (req, res) => res.render('reset'));
-
     this.router.get('/activate/:token', (req, res) => res.render('activate'));
-
     this.router.get('/dashboard', this.isTokenValid.bind(this), (req, res) => res.render('dashboard'));
-
     this.router.get('/workout', this.isTokenValid.bind(this), (req, res) => res.render('workout'));
-
     this.router.get('/workout/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('workout-preview'));
-
     this.router.get('/workout/:id/live', this.isTokenValid.bind(this), (req, res) => res.render('workout-live'));
-
     this.router.get('/exercise', this.isTokenValid.bind(this), (req, res) => res.render('exercise'));
-
     this.router.get('/exercise/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('exercise-preview'));
-
     this.router.get('/exercise/:id/live/:repetitions', this.isTokenValid.bind(this), (req, res) => res.render('exercise-live'));
-
     this.router.get('/user/profile', this.isTokenValid.bind(this), (req, res) => res.render('profile'));
-
     this.router.get('/user/settings', this.isTokenValid.bind(this), (req, res) => res.render('settings'));
-
     this.router.get('/404', (req, res) => res.render('404'));
-
     this.router.get('/*', (req, res) => res.redirect('/404'));
   }
 }
@@ -99,39 +81,25 @@ class UserRouter {
     /* Debug */
     this.router.use(morgan('dev'));
 
-    /*
-    ** Create a new user account and send an activation link.
-    */
+    /* Create a new user account and send an activation link. */
     this.router.post('/signup', this._app.controllers.user.signup.bind(this));
 
-    /*
-    ** Check user username and password and return a json web token.
-    */
+    /* Check user username and password and return a json web token. */
     this.router.post('/signin', this._app.controllers.user.signin.bind(this));
 
-    /*
-    ** Get user account informations using a json web token.
-    */
+    /* Get user account informations using a json web token. */
     this.router.post('/read', this._app.controllers.user.read.bind(this));
 
-    /*
-    ** Update user account informations using a json web token.
-    */
+    /* Update user account informations using a json web token. */
     this.router.put('/update', this._app.controllers.user.update.bind(this));
 
-    /*
-    ** Activate user account.
-    */
+    /* Activate user account. */
     this.router.put('/activate', this._app.controllers.user.activate.bind(this));
 
-    /*
-    ** Reset user password and send it by email.
-    */
+    /* Reset user password and send it by email. */
     this.router.put('/reset', this._app.controllers.user.reset.bind(this));
 
-    /*
-    ** Deactivate user account without deleting anything.
-    */
+    /* Deactivate user account without deleting anything. */
     this.router.delete('/deactivate', this._app.controllers.user.deactivate.bind(this));
   }
 }
@@ -141,15 +109,11 @@ class WorkoutRouter {
     this._app = app;
     this.router = express.Router();
 
-    /*
-    ** Get all workouts
-    */
-    this.router.post('/read', this._app.controllers.workout.readAll.bind(this));
+    /* Get all workouts */
+    this.router.post('/', this._app.controllers.workout.readAll.bind(this));
 
-    /*
-    ** Get one workout
-    */
-    this.router.post('/read/:id', this._app.controllers.workout.readOne.bind(this));
+    /* Get one workout */
+    this.router.post('/:id', this._app.controllers.workout.readOne.bind(this));
   }
 }
 
@@ -158,15 +122,24 @@ class ExerciseRouter {
     this._app = app;
     this.router = express.Router();
 
-    /*
-    ** Get all exercises
-    */
-    this.router.post('/read', this._app.controllers.exercise.readAll.bind(this));
+    /* Get all exercises */
+    this.router.post('/', this._app.controllers.exercise.readAll.bind(this));
 
-    /*
-    ** Get one exercise
-    */
-    this.router.post('/read/:id', this._app.controllers.exercise.readOne.bind(this));
+    /* Get one exercise */
+    this.router.post('/:id', this._app.controllers.exercise.readOne.bind(this));
+  }
+}
+
+class TrainingRouter {
+  constructor(app) {
+    this._app = app;
+    this.router = express.Router();
+
+    /* Create a new training */
+    this.router.post('/create', this._app.controllers.training.create.bind(this));
+
+    /* Get all trainings */
+    this.router.post('/read', this._app.controllers.training.read.bind(this));
   }
 }
 
@@ -178,6 +151,7 @@ class Router {
     this.user = new UserRouter(app);
     this.workout = new WorkoutRouter(app);
     this.exercise = new ExerciseRouter(app);
+    this.training = new TrainingRouter(app);
   }
 }
 

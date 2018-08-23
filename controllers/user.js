@@ -75,7 +75,7 @@ module.exports = class User {
                 Congratulations, you are a Fitletics Coach subscriber. You have decided to lead a healthier and happier life.
               </div>
               <div style="margin-bottom: 20px;">
-                Start your Fitletics experience now by activating your account. Click on the following link <a href="http://192.168.1.26:3000/activate/${user.dataValues.activationToken}">http://192.168.1.26:3000/activate/${user.dataValues.activationToken}</a>.
+                Start your Fitletics experience now by activating your account. Click on the following link <a href="http://192.168.1.26:3000/activate/${user.dataValues.activationToken}">http://192.168.1.26:3000/activate/${user.dataValues.activationToken}</a>
               </div>
               <div style="margin-bottom: 20px;">
                 You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.

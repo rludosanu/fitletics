@@ -2,7 +2,7 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>MyApp Home</title>
+		<title>Individual Exercices</title>
 
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
@@ -11,55 +11,48 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
 
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
+		<link rel="stylesheet" href="/public/stylesheets/logged.css" type="text/css" />
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
   <body ng-controller="exerciseList">
-    <header id="header">
-      <div class="layer">
-				<a href="/dashboard">
-        	<span class="fa fa-fw fa-arrow-left"></span>&nbsp;&nbsp;&nbsp;&nbsp;Individual Exercices
-				</a>
-      </div>
-    </header>
-
-    <div style="position: absolute; z-index: 1; top: 60px; left: 0px; width: 100%; height: calc(100% - 60px); overflow: auto;">
-      <div>
-        <div style="padding: 5px;" ng-repeat="exercise in exercises">
-					<a href="/exercise/{{ exercise.id }}/preview" style="color: white; text-decoration: none;">
-	          <div style=" display: flex; align-items: center;">
-	            <div style="width: 45px; padding: 5px 10px 5px 5px;">
-	              <img src="http://img.app-liv.jp.s3.amazonaws.com/icon/654810212/a2e9fc63ac821569853c1604232a718c.png" style="width: 100%; display: block; border-radius: 6px;" />
-	            </div>
-              <div style="font-size: 15px;">{{ exercise.name }}</div>
-	          </div>
+		<!-- Navigation -->
+		<section>
+			<header id="navigation">
+				<div class="item">
+					<a href="/dashboard">
+						<span class="fa fa-fw fa-arrow-left"></span>
 					</a>
-        </div>
-      </div>
-    </div>
+				</div>
+				<div class="item">
+					Individual Exercices
+				</div>
+			</header>
+		</section>
+		<!-- END Navigation -->
 
-		<script>
-		(function() {
-			var app = angular.module('my-app', ['ngCookies']);
+		<!-- Screen -->
+		<div id="screen">
+			<div id="screen-container">
+				<div id="exercises">
+					<div ng-repeat="exercise in exercises">
+						<a href="/exercise/{{ exercise.id }}/preview" style="color: white; text-decoration: none;">
+							<div class="layer">
+								<div class="layer-thumbnail">
+									<img src="/public/images/logo.png" style="width: 100%; display: block; border-radius: 6px;" />
+								</div>
+								<div class="layer-infos">
+									{{ exercise.name }}
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END Screen -->
 
-			app.controller('exerciseList', function($scope, $http) {
-				$scope.exercises = [];
-
-				$http({
-					method: 'POST',
-					url: 'http://192.168.1.26:3000/api/exercise/read'
-				})
-				.then(result => {
-					console.log(result);
-					$scope.exercises = result.data;
-				})
-				.catch(error => {
-					console.error(error);
-				});
-			});
-		})();
-		</script>
+		<script src="/public/controllers/exercise.js"></script>
 	</body>
 </html>

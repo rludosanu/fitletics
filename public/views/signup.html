@@ -2,7 +2,7 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>Fitletics Sign Up</title>
+		<title>Create An Account</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
@@ -13,45 +13,25 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
 	<body>
-		<section ng-controller="userMenu">
-			<!-- Navigation -->
-			<header id="navigation">
-				<div class="item">
-					<a href="/">
-						<span class="fa fa-fw fa-circle-o-notch"></span>
-					</a>
-				</div>
-				<div class="item title">
-					Fitletics
-				</div>
-				<div class="item" ng-click="menu.toggle()">
-					<span class="fa fa-fw" ng-class="{'fa-bars': !menu.display, 'fa-times': menu.display}"></span>
-				</div>
-			</header>
-			<!-- END Navigation -->
-
-			<!-- Side menu -->
-			<aside id="menu" ng-show="menu.display">
-				<ul>
-					<a href="/signin">
-						<li>Sign in</li>
-					</a>
-					<a href="/signup">
-						<li>Sign up</li>
-					</a>
-					<a href="/reset">
-						<li>Reset password</li>
-					</a>
-				</ul>
-			</aside>
-			<!-- END Side menu -->
-		</section>
+		<!-- Navigation -->
+		<header id="navigation">
+			<div class="item">
+				<a href="/">
+					<span class="fa fa-fw fa-arrow-left"></span>
+				</a>
+			</div>
+			<div class="item">
+				Create an account
+			</div>
+		</header>
+		<!-- END Navigation -->
 
 		<!-- Signup section -->
 		<section ng-controller="userSignup">
+			<!-- Popup -->
 			<div id="popup" ng-show="validation.display">
 				<div class="container">
-					<div class="content" style="">
+					<div class="content">
 						<h4>{{ validation.title }}</h4>
 						<p>{{ validation.context }}</p>
 						<div class="txt-right">
@@ -60,21 +40,42 @@
 					</div>
 				</div>
 			</div>
+			<!-- END Popup -->
 
+			<!-- Screen -->
 			<div id="screen">
-				<div class="container">
+				<div id="screen-container">
 					<div class="form">
+						<div class="description">Create a new Fitletics account and start you training today !</div>
 						<form ng-submit="signup()">
-							<input type="text" placeholder="First name" ng-model="user.firstName" />
-							<input type="text" placeholder="Last name" ng-model="user.lastName" />
-							<input type="text" placeholder="Username" ng-model="user.username" />
-							<input type="email" placeholder="email" ng-model="user.email" />
-							<input type="password" placeholder="Password" ng-model="user.password" />
-							<input type="submit" value="Sign up" />
+							<div class="row">
+								<div class="label">First name</div>
+								<div class="input"><input type="text" placeholder="First name" ng-model="user.firstName" /></div>
+							</div>
+							<div class="row">
+								<div class="label">Last name</div>
+								<div class="input"><input type="text" placeholder="Last name" ng-model="user.lastName" /></div>
+							</div>
+							<div class="row">
+								<div class="label">Username</div>
+								<div class="input"><input type="text" placeholder="Username" ng-model="user.username" /></div>
+							</div>
+							<div class="row">
+								<div class="label">Email address</div>
+								<div class="input"><input type="email" placeholder="Email address" ng-model="user.email" /></div>
+							</div>
+							<div class="row">
+								<div class="label">Password</div>
+								<div class="input"><input type="password" placeholder="Password" ng-model="user.password" /></div>
+							</div>
+							<div class="row">
+								<input type="submit" value="Create my account" />
+							</div>
 						</form>
 					</div>
 				</div>
 			</div>
+			<!-- END Screen -->
 		</section>
 		<!-- END Signup section -->
 

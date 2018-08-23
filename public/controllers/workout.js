@@ -1,124 +1,287 @@
 (function() {
 	var app = angular.module('my-app', ['ngCookies']);
 
-	app.controller('exerciseList', function($scope) {
-		var exerciseNames = Object.keys(exercises);
+	/*
+	** workoutList
+	**		List of all available workouts.
+	*/
+	app.controller('workoutList', function($scope, $http) {
+		$scope.workouts = [];
+		$scope.workoutRounds = 0;
 
-		$scope.exercises = [];
-		for (var i = 0 ; i < exerciseNames.length ; i++) {
-			$scope.exercises.push({
-				name: exercises[exerciseNames[i]].name,
-				points: exercises[exerciseNames[i]].points,
-				body: exercises[exerciseNames[i]].body,
-				difficulty: exercises[exerciseNames[i]].difficulty
-			});
+		$http({
+			method: 'POST',
+			url: 'http://192.168.1.26:3000/api/workout/'
+		})
+		.then(result => {
+			console.log(result);
+			$scope.workouts = result.data;
+		})
+		.catch(error => {
+			console.error(error);
+		});
+	});
+
+	/*
+	** workoutPreview
+	**		Preview of a workout.
+	*/
+	app.controller('workoutPreview', function($scope, $http, $location, $window) {
+		var url = $location.absUrl().split('/');
+		var id = url[url.length - 2];
+
+		function getMaxVolume() {
+			var max = 0;
+
+			for (var i = 0 ; i < $scope.workout.rounds.length ; i++) {
+				for (var j = 0 ; j < $scope.workout.rounds[i].length ; j++) {
+					var volume = $scope.workout.rounds[i][j].volume;
+
+					if (volume >= max)
+						max = volume;
+				}
+			}
+			return max;
 		}
+
+		$scope.start = function() {
+			$window.location.href = '/workout/' + id + '/live';
+		};
+
+		$scope.workout = {};
+
+		$scope.barchart = {
+			maxHeight: 100,
+			width: 24,
+			maxVolume: 0
+		};
+
+		$http({
+			method: 'POST',
+			url: 'http://192.168.1.26:3000/api/workout/' + id
+		})
+		.then(result => {
+			console.log(result);
+			$scope.workout = result.data;
+			$scope.barchart.maxVolume = getMaxVolume();
+		})
+		.catch(error => {
+			console.error(error);
+		});
 	});
 
-	app.controller('exercisePreview', function($scope, $location) {
+	/*
+	** workoutLive
+	**		Live workout training session.
+	*/
+	app.controller('workoutLive', function($scope, $interval, $window, $location, $http) {
 		var url = $location.absUrl().split('/');
-		var exercise = exercises[url[url.length - 2]];
+		var id = url[url.length - 2];
+		var workout = null;
 
-		$scope.exercise = {
-			name: exercise.name,
-			points: exercise.points,
-			difficulty: exercise.difficulty,
-			equipment: exercise.equipment.join(', '),
-			body: exercise.body.join(', ')
-		};
+		$http({
+			method: 'POST',
+			url: 'http://192.168.1.26:3000/api/workout/' + id
+		})
+		.then(result => {
+			console.log(result);
+			workout = result.data;
 
-		$scope.repetitions = 0;
-	});
+			$scope.workout = {
+				id: workout.id,
+				name: workout.name,
+				currentRound: 0,
+				currentExercise: 0,
+				exercise: null,
+				completionPercentage: 0,
+				rounds: workout.rounds,
+				updateExercice() {
+					var self = this;
+					var tmp = 0;
 
-	app.controller('exerciseLive', function($scope, $interval, $window, $location) {
-		var url = $location.absUrl().split('/');
-		var repetitions = url[url.length - 1];
-		var exercise = exercises[url[url.length - 3]];
+					for (var i = 0 ; i < self.rounds.length ; i++) {
+						for (var j = 0 ; j < self.rounds[i].length ; j++) {
+							if (tmp == self.currentExercise) {
+								self.exercise = self.rounds[i][j];
+								self.currentRound = i + 1;
+								return ;
+							} else {
+								tmp += 1;
+							}
+						}
+					}
+				},
+				nextExercice() {
+					var self = this;
+					var total = 0;
 
-		$scope.exercise = {
-			name: exercise.name,
-			repetitions: repetitions
-		};
+					for (var i = 0 ; i < self.rounds.length ; i++) {
+						for (var j = 0 ; j < self.rounds[i].length ; j++) {
+							total++;
+						}
+					}
 
-		$scope.state = {
-			giveup: false
-		};
+					if (self.currentExercise == total - 1) {
+						self.currentExercise++;
+						return 1;
+					} else {
+						self.currentExercise++;
+						return 0;
+					}
+				},
+				updatePercentage() {
+					var self = this;
+					var total = 0;
 
-		$scope.timer = {
-			counter: 0,
-			timer: '00:00',
-			handle: null,
-			updateHMS() {
-				var self = this;
-				var sec_num = parseInt(self.counter, 10);
-				var hours = Math.floor(sec_num / 3600);
-				var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-				var seconds = sec_num - (hours * 3600) - (minutes * 60);
+					for (var i = 0 ; i < self.rounds.length ; i++) {
+						for (var j = 0 ; j < self.rounds[i].length ; j++) {
+							total++;
+						}
+					}
 
-				if (hours < 10)
-					hours = '0' + hours;
-				if (minutes < 10)
-					minutes = '0' + minutes;
-				if (seconds < 10)
-					seconds = '0' + seconds;
-				if (hours == 0)
-					self.timer = minutes + ':' + seconds;
-				else
-					self.timer = hours + ':' + minutes + ':' + seconds;
-			},
-			start() {
-				var self = this;
+					self.completionPercentage = Math.floor((self.currentExercise * 100) / total);
+				},
+				getMaxRepetition() {
+					var self = this;
+					var max = 0;
 
-				if (self.handle)
-					return ;
-				self.timer = '00:00';
-				self.handle = $interval(function() {
-					self.counter += 1;
-					self.updateHMS();
-				}, 1000);
-			},
-			stop() {
-				var self = this;
+					for (var i = 0 ; i < self.rounds.length ; i++) {
+						for (var j = 0 ; j < self.rounds[i].length ; j++) {
+							var volume = self.rounds[i][j].volume;
 
-				$interval.cancel(self.handle);
-				self.handle = null;
-				self.counter = 0;
-			}
-		};
-
-		$scope.buttonText = 'Start';
-
-		$scope.state = {
-			state: 'waiting',
-			giveup: false,
-			fullscreen: false,
-			update() {
-				var self = this;
-
-				if (self.state == 'waiting') {
-					$scope.timer.start();
-					$scope.buttonText = 'Finish';
-					self.state = 'ongoing';
-				} else if (self.state == 'ongoing') {
-					$scope.timer.stop();
-					$window.location.href = '/exercise/';
+							if (volume >= max)
+								max = volume;
+						}
+					}
+					return max;
 				}
-			},
-			toggleFullscreen() {
-				console.log('toggleFullscreen');
-				var self = this;
+			};
 
-				document.documentElement.requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullScreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
-				document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozExitFullscreen || document.msExitFullscreen;
+			$scope.barchart = {
+				maxHeight: 100,
+				width: 24,
+				frontColor: '#3B7FF1',
+				backgroundColor: '#292929',
+				textColor: 'white',
+				maxRepetition: $scope.workout.getMaxRepetition(),
+				isDoneCSS(round, exercise) {
+					var self = this;
+					var tmp = 0;
 
-				if (self.fullscreen == true) {
-					document.exitFullscreen(document);
-					self.fullscreen = false;
-				} else {
-					document.documentElement.requestFullscreen(document.documentElement);
-					self.fullscreen = true;
+					for (var i = 0 ; i < $scope.workout.rounds.length ; i++) {
+						for (var j = 0 ; j < $scope.workout.rounds[i].length ; j++) {
+							if (round == i && exercise == j && tmp < $scope.workout.currentExercise) {
+								return self.frontColor;
+							}
+							tmp++;
+						}
+					}
+					return self.backgroundColor;
 				}
-			}
-		};
+			};
+
+			$scope.buttonText = 'Start';
+
+			// App timer
+			$scope.timer = {
+				counter: 0,
+				timer: '00:00',
+				handle: null,
+				updateHMS() {
+					var self = this;
+					var sec_num = parseInt(self.counter, 10);
+					var hours = Math.floor(sec_num / 3600);
+					var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+					var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+					if (hours < 10)
+						hours = '0' + hours;
+					if (minutes < 10)
+						minutes = '0' + minutes;
+					if (seconds < 10)
+						seconds = '0' + seconds;
+					if (hours == 0)
+						self.timer = minutes + ':' + seconds;
+					else
+						self.timer = hours + ':' + minutes + ':' + seconds;
+				},
+				start() {
+					var self = this;
+
+					if (self.handle)
+						return ;
+					self.timer = '00:00';
+					self.handle = $interval(function() {
+						self.counter += 1;
+						self.updateHMS();
+					}, 1000);
+				},
+				stop() {
+					var self = this;
+
+					$interval.cancel(self.handle);
+					self.handle = null;
+					self.counter = 0;
+				}
+			};
+
+			// App state
+			$scope.state = {
+				state: 'waiting',
+				giveup: false,
+				fullscreen: false,
+				update() {
+					var self = this;
+
+					if (self.state == 'waiting') {
+						$scope.timer.start();
+						$scope.buttonText = 'Next';
+						self.state = 'ongoing';
+					} else if (self.state == 'ongoing') {
+						if ($scope.workout.nextExercice() == 1) {
+							$scope.timer.stop();
+							$scope.buttonText = 'Finish';
+							self.state = 'finished';
+						}
+						$scope.workout.updatePercentage();
+						$scope.workout.updateExercice();
+					} else if (self.state == 'finished') {
+						$http({
+							method: 'POST',
+							url: 'http://192.168.1.26:3000/api/training/create',
+							data: {
+								workoutId: parseInt(id),
+								volume: 1
+							}
+						})
+						.then(result => {
+							$window.location.href = '/user/profile';
+						})
+						.catch(error => console.error(error));
+					}
+				},
+				toggleFullscreen() {
+					console.log('toggleFullscreen');
+					var self = this;
+
+					document.documentElement.requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullScreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
+					document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozExitFullscreen || document.msExitFullscreen;
+
+					if (self.fullscreen == true) {
+						document.exitFullscreen(document);
+						self.fullscreen = false;
+					} else {
+						document.documentElement.requestFullscreen(document.documentElement);
+						self.fullscreen = true;
+					}
+				}
+			};
+
+			// On load update current displayed exercise
+			$scope.workout.updateExercice();
+		})
+		.catch(error => {
+			console.error(error);
+		});
 	});
 })();

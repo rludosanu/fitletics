@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 {{=[[ ]]=}}
-<html ng-app="my-app">
+<html>
 	<head>
-		<title>MyApp Home</title>
-
+		<title>Dashboard</title>
     <meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
-
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
-		<link rel="stylesheet" media="only screen and (max-width: 600px)" href="/public/stylesheets/xs-screen.css" type="text/css" />
-
+		<link rel="stylesheet" href="/public/stylesheets/logged.css" type="text/css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
 	<body>
-		<!--
-			Popup to allow fullscreen.
-			This will only work with an angular router.
-		-->
-		<!-- <div style="position: absolute; z-index: 10; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.8);" ng-show="allowFullscreen == null">
-			<div style="padding: 10px; width: 100%;">
-				<div style="background: white; padding: 25px 15px;">
-					<div style="margin-bottom: 5px; font-size: 17px; font-weight: bold;">Enter fullscreen mode</div>
-					<div style="margin-bottom: 25px; font-size: 15px;">Fullscreen mode will provide you a much better experience. Would you like to activate it ?</div>
-					<div style="text-align: right;">
-						<a ng-click="rejectFullscreen()" style="color: #3B7FF1; font-size: 15px; margin: 0px 10px;">NO</a>
-						<a ng-click="acceptFullscreen()" style="color: #3B7FF1; font-size: 15px; margin: 0px 10px;">YES</a>
-					</div>
+		<!-- Navigation -->
+		<section>
+			<header id="navigation">
+				<div class="item">
+					<a href="/dashboard">
+						<span class="fa fa-fw fa-bolt"></span>
+					</a>
 				</div>
-			</div>
-		</div> -->
+				<div class="item">
+					Dashboard
+				</div>
+				<div class="item">
+					<a href="/user/profile">
+						<span class="fa fa-fw fa-user"></span>
+					</a>
+				</div>
+			</header>
+		</section>
+		<!-- END Navigation -->
 
-		<div id="index-container">
-			<div id="training">
+		<!-- Apps list -->
+		<div id="screen">
+			<div id="dashboard">
 				<a href="/workout">
 					<div class="layer layer-workouts">
 						<div class="layer-content">
@@ -58,20 +58,8 @@
 						</div>
 					</div>
 				</a>
-				<div class="layer layer-locations">
-					<div class="layer-content">
-						<h2>Training Locations</h2>
-						<p>Find other fitletics athletes</p>
-					</div>
-				</div>
 			</div>
 		</div>
-
-		<footer id="footer" class="bg-lightbrown" ng-controller="userSignout">
-			<a href="/user/profile/"><span class="fa fa-fw fa-user"></span></a>
-			<a ng-click="signout()"><span class="fa fa-fw fa-sign-out"></span></a>
-		</footer>
-
-		<script src="/public/controllers/user.js"></script>
+		<!-- Apps list -->
 	</body>
 </html>
