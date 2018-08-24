@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 var cookieParser = require('cookie-parser');
 
@@ -28,13 +27,17 @@ class ClientRouter {
     this.isTokenValid = function(req, res, next) {
       var self = this;
 
+      console.log('[ INFO ] Checking token...');
       if (!req.cookies || !req.cookies.token) {
+        console.log('[ INFO ] Token not found');
         res.redirect('/');
       } else {
         jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
           if (error) {
+            console.log('[ INFO ] Token cannot be decoded');
             res.redirect('/');
           } else {
+            console.log('[ INFO ] Token decoded');
             next();
           }
         });
@@ -43,9 +46,6 @@ class ClientRouter {
 
     /* Create new Express router */
     this.router = express.Router();
-
-    /* Debug */
-    this.router.use(morgan('dev'));
 
     /* Parse cookies */
     this.router.use(cookieParser());
@@ -56,6 +56,7 @@ class ClientRouter {
     /* Unlogged routing */
     this.router.get('/', (req, res) => res.render('index'));
     this.router.get('/signin', (req, res) => res.render('signin'));
+    this.router.get('/signout', (req, res) => res.render('signout'));
     this.router.get('/signup', (req, res) => res.render('signup'));
     this.router.get('/activate/:token', (req, res) => res.render('activate'));
     this.router.get('/reset/password', (req, res) => res.render('user-reset-password'));
@@ -83,9 +84,6 @@ class UserRouter {
   constructor(app) {
     this._app = app;
     this.router = express.Router();
-
-    /* Debug */
-    this.router.use(morgan('dev'));
 
     /* Create a new user account and send an activation link */
     this.router.post('/signup', this._app.controllers.user.signup.bind(this));

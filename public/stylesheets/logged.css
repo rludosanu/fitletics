@@ -280,16 +280,6 @@
 ** Profile
 */
 
-#profile-settings {
-  text-align: right;
-}
-
-#profile-settings a {
-  font-size: 18px;
-  color: white;
-  text-decoration: none;
-}
-
 #profile-logo {
   width: 120px;
   margin: 25px auto 25px auto;
@@ -349,4 +339,36 @@
   align-items: center;
   font-size: 17px;
   color: white;
+}
+
+/*
+** Settings
+*/
+
+#settings-menu .container {
+  display: flex;
+  align-items: center;
+  padding: 25px 0px;
+  border-bottom: 1px solid #292929;
+}
+
+#settings-menu .container .logo {
+  margin-right: 15px;
+  font-size: 22px;
+  color: white;
+}
+
+#settings-menu .container .content {
+
+}
+
+#settings-menu .container .content .title {
+  font-size: 17px;
+  color: white;
+  margin-bottom: 5px;
+}
+
+#settings-menu .container .content .caption {
+  font-size: 12px;
+  color: #C7C6C4;
 }

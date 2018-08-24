@@ -9,8 +9,7 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
 		<link rel="stylesheet" href="/public/stylesheets/logged.css" type="text/css" />
-		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script> -->
-		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script> -->
+		<link rel="icon" href="/public/images/favicon.png" type="image/png" />
 	</head>
 		<!-- Navigation -->
 		<header id="navigation">
@@ -28,8 +27,41 @@
 		<!-- Screen -->
 		<div id="screen">
 			<div id="screen-container">
-				<a href="/user/update/profile">Update profile</a>
-				<a href="/user/update/password">Update password</a>
+				<div id="settings-menu">
+					<div class="container">
+						<div class="logo">
+							<span class="fa fa-fw fa-bars"></span>
+						</div>
+						<div class="content">
+							<a href="/user/update/profile">
+								<div class="title">Profile</div>
+								<div class="caption">Update your personal informations</div>
+							</a>
+						</div>
+					</div>
+					<div class="container">
+						<div class="logo">
+							<span class="fa fa-fw fa-lock"></span>
+						</div>
+						<div class="content">
+							<a href="/user/update/password">
+								<div class="title">Password</div>
+								<div class="caption">Change your current password</div>
+							</a>
+						</div>
+					</div>
+					<div class="container">
+						<div class="logo">
+							<span class="fa fa-fw fa-arrow-right"></span>
+						</div>
+						<div class="content">
+							<a href="/signout">
+								<div class="title">Disconnection</div>
+								<div class="caption">Sign out from this session</div>
+							</a>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<!-- END Screen -->

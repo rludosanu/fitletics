@@ -9,6 +9,7 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
 		<link rel="stylesheet" href="/public/stylesheets/common.css" type="text/css" />
 		<link rel="stylesheet" href="/public/stylesheets/logged.css" type="text/css" />
+		<link rel="icon" href="/public/images/favicon.png" type="image/png" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
@@ -24,8 +25,8 @@
 				Profile
 			</div>
 			<div class="item">
-				<a ng-click="signout()">
-					<span class="fa fa-fw fa-arrow-right"></span>
+				<a href="/user/settings">
+					<span class="fa fa-fw fa-cogs"></span>
 				</a>
 			</div>
 		</header>
@@ -34,16 +35,8 @@
 		<!-- Screen -->
 		<div id="screen">
 			<div id="screen-container">
-				<!-- Settings -->
-				<div id="profile-settings">
-					<a href="/user/settings">
-						<span class="fa fa-fw fa-cogs"></span>
-					</a>
-				</div>
-				<!-- END Settings -->
-
 				<!-- Logo -->
-				<div id="profile-logo" style="">
+				<div id="profile-logo">
 					<img src="/public/images/logo.png" />
 				</div>
 				<!-- END Logo -->

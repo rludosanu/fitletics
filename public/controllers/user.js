@@ -70,9 +70,9 @@
       validate: function() {
         var self = this;
 
-        if (!$scope.user.username) {
+        if (!self.datas.username) {
           $scope.validation.trigger('Username is not allowed to be empty.');
-        } else if (!$scope.user.password || $scope.user.password.length < 6) {
+        } else if (!self.datas.password || self.datas.password.length < 6) {
           $scope.validation.trigger('Password is not allowed to be empty and less than 6 characters long.');
         } else {
           return true;
@@ -193,6 +193,25 @@
        });
       }
     };
+  });
+
+  /*****************************************************************************
+  **
+  ** Signout
+  **
+  *****************************************************************************/
+  app.controller('userSignout', function($scope, $http, $cookies, $window) {
+    var cookies = $cookies.getAll();
+    var total = Object.keys(cookies).length;
+    var current = 0;
+
+    angular.forEach(cookies, function (v, k) {
+      $cookies.remove(k);
+      current++;
+      if (current == total) {
+        $window.location.href = '/';
+      }
+    });
   });
 
   /*****************************************************************************
@@ -456,21 +475,6 @@
     .catch(error => {
       console.error(error.data.error);
     });
-
-    /* Sign out and removes cookies */
-    $scope.signout = function() {
-      var cookies = $cookies.getAll();
-      var total = Object.keys(cookies).length;
-      var current = 0;
-
-      angular.forEach(cookies, function (v, k) {
-        $cookies.remove(k);
-        current++;
-        if (current == total) {
-          $window.location.href = '/';
-        }
-      });
-    };
   });
 
   /*****************************************************************************
