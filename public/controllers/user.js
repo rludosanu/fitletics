@@ -54,8 +54,8 @@
     $scope.form = {
       /* Datas values */
       datas: {
-        username: 'rludosanu',
-        password: 'ludosanu'
+        username: '',
+        password: ''
       },
       /* Reset datas values */
       reset: function() {
@@ -132,11 +132,11 @@
     $scope.form = {
       /* Datas values */
       datas: {
-        firstName: 'Razvan',
-        lastName: 'Ludosanu',
-        username: 'rludosanu',
-        email: 'r.ludosanu@gmail.com',
-        password: 'ludosanu'
+        firstName: '',
+        lastName: '',
+        username: '',
+        email: '',
+        password: ''
       },
       /* Reset all datas values */
       reset: function() {
@@ -206,12 +206,10 @@
     var current = 0;
 
     if (!total) {
-      console.log('No cookies');
       $window.location.href = '/';
     }
 
     angular.forEach(cookies, function (v, k) {
-      console.log(v);
       $cookies.remove(k);
       current++;
       if (current == total) {
@@ -283,7 +281,6 @@
           }
         })
         .catch(error => {
-          console.error(error);
           popValidation(false, error.data.error, 'Database error');
         });
       },
@@ -306,12 +303,10 @@
           }
         })
         .then(result => {
-          console.log(result);
           $scope.validation.trigger(true, 'Your profile account informations have been saved.')
           self.datas.password = '';
         })
         .catch(error => {
-          console.error(error.data.error);
           $scope.validation.trigger(false, error.data.error);
         });
       }
@@ -422,7 +417,7 @@
     $scope.form = {
       /* Datas values */
       datas: {
-        email: 'r.ludosanu@gmail.com'
+        email: ''
       },
       /* Pre-validate datas */
       validate: function() {

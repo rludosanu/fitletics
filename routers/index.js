@@ -7,22 +7,6 @@ class ClientRouter {
   constructor(app) {
     this._app = app;
 
-    this.checkToken = function(req, res, next) {
-      var self = this;
-
-      if (!req.cookies || !req.cookies.token) {
-        res.redirect('/');
-      } else {
-        jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-          if (error) {
-            res.redirect('/');
-          } else {
-            next();
-          }
-        });
-      }
-    };
-
     /* Valid session token */
     this.isTokenValid = function(req, res, next) {
       var self = this;
