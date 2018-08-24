@@ -5,7 +5,7 @@ Fitletics is a calisthenics workout web app designed for mobiles browsers only !
 
 ## Screenshots
 
-<center>
+<p align="center">
 <img src="./public/images/screenshot_index.png" width="30%">
 <img src="./public/images/screenshot_signin.png" width="30%" />
 <img src="./public/images/screenshot_dashboard.png" width="30%" />
@@ -14,7 +14,7 @@ Fitletics is a calisthenics workout web app designed for mobiles browsers only !
 <img src="./public/images/screenshot_workout.png" width="30%" />
 <img src="./public/images/screenshot_profile.png" width="30%" />
 <img src="./public/images/screenshot_settings.png" width="30%" />
-</center>
+</p>
 
 ## Demo
 The current live demo is hosted at https://nodehub.freeboxos.fr:4000
