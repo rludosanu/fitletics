@@ -27,20 +27,33 @@ class ClientRouter {
     this.isTokenValid = function(req, res, next) {
       var self = this;
 
-      console.log('[ INFO ] Checking token...');
       if (!req.cookies || !req.cookies.token) {
-        console.log('[ INFO ] Token not found');
         res.redirect('/');
       } else {
         jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
           if (error) {
-            console.log('[ INFO ] Token cannot be decoded');
             res.redirect('/');
           } else {
-            console.log('[ INFO ] Token decoded');
             next();
           }
         });
+      }
+    };
+
+    /* Check if token exists */
+    this.isLoggedIn = function(req, res, next) {
+      var self = this;
+
+      if (req.cookies && req.cookies.token) {
+        jwt.verify(req.cookies.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
+          if (error) {
+            next();
+          } else {
+            res.redirect('/dashboard');
+          }
+        });
+      } else {
+        next();
       }
     };
 
@@ -54,15 +67,17 @@ class ClientRouter {
     this.router.use('/public', express.static(path.join(__dirname, '../public')));
 
     /* Unlogged routing */
-    this.router.get('/', (req, res) => res.render('index'));
-    this.router.get('/signin', (req, res) => res.render('signin'));
     this.router.get('/signout', (req, res) => res.render('signout'));
-    this.router.get('/signup', (req, res) => res.render('signup'));
-    this.router.get('/activate/:token', (req, res) => res.render('activate'));
-    this.router.get('/reset/password', (req, res) => res.render('user-reset-password'));
+
+    this.router.get('/', this.isLoggedIn.bind(this), (req, res) => res.render('index'));
+    this.router.get('/signin', this.isLoggedIn.bind(this), (req, res) => res.render('signin'));
+    this.router.get('/signup', this.isLoggedIn.bind(this), (req, res) => res.render('signup'));
+    this.router.get('/activate/:token', this.isLoggedIn.bind(this), (req, res) => res.render('activate'));
+    this.router.get('/reset/password', this.isLoggedIn.bind(this), (req, res) => res.render('user-reset-password'));
 
     /* Logged routing */
     this.router.get('/dashboard', this.isTokenValid.bind(this), (req, res) => res.render('dashboard'));
+    this.router.get('/coach', this.isTokenValid.bind(this), (req, res) => res.render('coach'));
     this.router.get('/workout', this.isTokenValid.bind(this), (req, res) => res.render('workout'));
     this.router.get('/workout/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('workout-preview'));
     this.router.get('/workout/:id/live', this.isTokenValid.bind(this), (req, res) => res.render('workout-live'));

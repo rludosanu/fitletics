@@ -205,7 +205,13 @@
     var total = Object.keys(cookies).length;
     var current = 0;
 
+    if (!total) {
+      console.log('No cookies');
+      $window.location.href = '/';
+    }
+
     angular.forEach(cookies, function (v, k) {
+      console.log(v);
       $cookies.remove(k);
       current++;
       if (current == total) {
