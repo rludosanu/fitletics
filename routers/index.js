@@ -53,12 +53,14 @@ class ClientRouter {
     /* Set up static files directory */
     this.router.use('/public', express.static(path.join(__dirname, '../public')));
 
-    /* Set up routing */
+    /* Unlogged routing */
     this.router.get('/', (req, res) => res.render('index'));
     this.router.get('/signin', (req, res) => res.render('signin'));
     this.router.get('/signup', (req, res) => res.render('signup'));
-    this.router.get('/reset', (req, res) => res.render('reset'));
     this.router.get('/activate/:token', (req, res) => res.render('activate'));
+    this.router.get('/reset/password', (req, res) => res.render('user-reset-password'));
+
+    /* Logged routing */
     this.router.get('/dashboard', this.isTokenValid.bind(this), (req, res) => res.render('dashboard'));
     this.router.get('/workout', this.isTokenValid.bind(this), (req, res) => res.render('workout'));
     this.router.get('/workout/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('workout-preview'));
@@ -66,8 +68,12 @@ class ClientRouter {
     this.router.get('/exercise', this.isTokenValid.bind(this), (req, res) => res.render('exercise'));
     this.router.get('/exercise/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('exercise-preview'));
     this.router.get('/exercise/:id/live/:repetitions', this.isTokenValid.bind(this), (req, res) => res.render('exercise-live'));
-    this.router.get('/user/profile', this.isTokenValid.bind(this), (req, res) => res.render('profile'));
-    this.router.get('/user/settings', this.isTokenValid.bind(this), (req, res) => res.render('settings'));
+    this.router.get('/user/profile', this.isTokenValid.bind(this), (req, res) => res.render('user-profile'));
+    this.router.get('/user/settings', this.isTokenValid.bind(this), (req, res) => res.render('user-settings'));
+    this.router.get('/user/update/password', this.isTokenValid.bind(this), (req, res) => res.render('user-update-password'));
+    this.router.get('/user/update/profile', this.isTokenValid.bind(this), (req, res) => res.render('user-update-profile'));
+
+    /* Error routing */
     this.router.get('/404', (req, res) => res.render('404'));
     this.router.get('/*', (req, res) => res.redirect('/404'));
   }
@@ -81,26 +87,29 @@ class UserRouter {
     /* Debug */
     this.router.use(morgan('dev'));
 
-    /* Create a new user account and send an activation link. */
+    /* Create a new user account and send an activation link */
     this.router.post('/signup', this._app.controllers.user.signup.bind(this));
 
-    /* Check user username and password and return a json web token. */
+    /* Check user username and password */
     this.router.post('/signin', this._app.controllers.user.signin.bind(this));
 
-    /* Get user account informations using a json web token. */
+    /* Update user account informations */
+    this.router.put('/update/profile', this._app.controllers.user.updateProfile.bind(this));
+
+    /* Update user password */
+    this.router.put('/update/password', this._app.controllers.user.updatePassword.bind(this));
+
+    /* Reset user password and send it by email */
+    this.router.put('/reset/password', this._app.controllers.user.resetPassword.bind(this));
+
+    /* Get user account informations */
     this.router.post('/read', this._app.controllers.user.read.bind(this));
 
-    /* Update user account informations using a json web token. */
-    this.router.put('/update', this._app.controllers.user.update.bind(this));
-
-    /* Activate user account. */
+    /* Activate user account */
     this.router.put('/activate', this._app.controllers.user.activate.bind(this));
 
-    /* Reset user password and send it by email. */
-    this.router.put('/reset', this._app.controllers.user.reset.bind(this));
-
-    /* Deactivate user account without deleting anything. */
-    this.router.delete('/deactivate', this._app.controllers.user.deactivate.bind(this));
+    /* Deactivate user account */
+    this.router.put('/deactivate', this._app.controllers.user.deactivate.bind(this));
   }
 }
 

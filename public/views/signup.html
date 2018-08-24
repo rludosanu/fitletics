@@ -47,26 +47,26 @@
 				<div id="screen-container">
 					<div class="form">
 						<div class="description">Create a new Fitletics account and start you training today !</div>
-						<form ng-submit="signup()">
+						<form ng-submit="form.submit()">
 							<div class="row">
 								<div class="label">First name</div>
-								<div class="input"><input type="text" placeholder="First name" ng-model="user.firstName" /></div>
+								<div class="input"><input type="text" placeholder="First name" ng-model="form.datas.firstName" /></div>
 							</div>
 							<div class="row">
 								<div class="label">Last name</div>
-								<div class="input"><input type="text" placeholder="Last name" ng-model="user.lastName" /></div>
+								<div class="input"><input type="text" placeholder="Last name" ng-model="form.datas.lastName" /></div>
 							</div>
 							<div class="row">
 								<div class="label">Username</div>
-								<div class="input"><input type="text" placeholder="Username" ng-model="user.username" /></div>
+								<div class="input"><input type="text" placeholder="Username" ng-model="form.datas.username" /></div>
 							</div>
 							<div class="row">
 								<div class="label">Email address</div>
-								<div class="input"><input type="email" placeholder="Email address" ng-model="user.email" /></div>
+								<div class="input"><input type="email" placeholder="Email address" ng-model="form.datas.email" /></div>
 							</div>
 							<div class="row">
 								<div class="label">Password</div>
-								<div class="input"><input type="password" placeholder="Password" ng-model="user.password" /></div>
+								<div class="input"><input type="password" placeholder="Password" ng-model="form.datas.password" /></div>
 							</div>
 							<div class="row">
 								<input type="submit" value="Create my account" />

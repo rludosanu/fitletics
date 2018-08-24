@@ -24,11 +24,6 @@
 				Profile
 			</div>
 			<div class="item">
-				<a href="/user/settings" style="color: white;">
-					<span class="fa fa-fw fa-cog"></span>
-				</a>
-			</div>
-			<div class="item">
 				<a ng-click="signout()">
 					<span class="fa fa-fw fa-arrow-right"></span>
 				</a>
@@ -39,6 +34,14 @@
 		<!-- Screen -->
 		<div id="screen">
 			<div id="screen-container">
+				<!-- Settings -->
+				<div id="profile-settings">
+					<a href="/user/settings">
+						<span class="fa fa-fw fa-cogs"></span>
+					</a>
+				</div>
+				<!-- END Settings -->
+
 				<!-- Logo -->
 				<div id="profile-logo" style="">
 					<img src="/public/images/logo.png" />

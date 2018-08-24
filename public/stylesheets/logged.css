@@ -280,6 +280,16 @@
 ** Profile
 */
 
+#profile-settings {
+  text-align: right;
+}
+
+#profile-settings a {
+  font-size: 18px;
+  color: white;
+  text-decoration: none;
+}
+
 #profile-logo {
   width: 120px;
   margin: 25px auto 25px auto;

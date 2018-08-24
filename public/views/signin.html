@@ -47,14 +47,14 @@
 				<div id="screen-container">
 					<div class="form">
 						<div class="description">Login to your Fitletics account.</div>
-						<form ng-submit="signin()">
+						<form ng-submit="form.submit()">
 							<div class="row">
 								<div class="label">Username</div>
-								<div class="input"><input type="text" placeholder="Username" ng-model="user.username" /></div>
+								<div class="input"><input type="text" placeholder="Username" ng-model="form.datas.username" /></div>
 							</div>
 							<div class="row">
 								<div class="label">Password</div>
-								<div class="input"><input type="password" placeholder="Password" ng-model="user.password" /></div>
+								<div class="input"><input type="password" placeholder="Password" ng-model="form.datas.password" /></div>
 							</div>
 							<div class="row">
 								<input type="submit" value="Login" />

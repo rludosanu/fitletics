@@ -2,7 +2,7 @@
 {{=[[ ]]=}}
 <html ng-app="my-app">
 	<head>
-		<title>Account Informations</title>
+		<title>Update Profile</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Quicksand:300,400,500,700" />
@@ -12,16 +12,16 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-cookies.js"></script>
 	</head>
-	<body ng-controller="userUpdate">
+	<body ng-controller="userUpdateProfile">
 		<!-- Navigation -->
 		<header id="navigation">
 			<div class="item">
-				<a href="/user/profile">
+				<a href="/user/settings">
 					<span class="fa fa-fw fa-arrow-left"></span>
 				</a>
 			</div>
 			<div class="item">
-				Account Informations
+				Update Profile
 			</div>
 		</header>
 		<!-- END Navigation -->
@@ -43,29 +43,29 @@
 			<div id="screen-container">
 				<div class="form">
 					<div class="description">Edit your personal account informations.</div>
-					<form ng-submit="update()">
+					<form ng-submit="form.submit()">
 						<div class="row">
 							<div class="label">First name</div>
-							<div class="input"><input type="text" placeholder="First name" ng-model="user.firstName" class="input-settings" /></div>
+							<div class="input"><input type="text" placeholder="First name" ng-model="form.datas.firstName" /></div>
 						</div>
 						<div class="row">
 							<div class="label">Last name</div>
-							<div class="input"><input type="text" placeholder="Last name" ng-model="user.lastName" class="input-settings" /></div>
+							<div class="input"><input type="text" placeholder="Last name" ng-model="form.datas.lastName" /></div>
 						</div>
 						<div class="row">
 							<div class="label">Username</div>
-							<div class="input"><input type="text" placeholder="Username" ng-model="user.username" class="input-settings" /></div>
+							<div class="input"><input type="text" placeholder="Username" ng-model="form.datas.username" /></div>
 						</div>
 						<div class="row">
 							<div class="label">Email address</div>
-							<div class="input"><input type="email" placeholder="Email address" ng-model="user.email" class="input-settings" /></div>
+							<div class="input"><input type="email" placeholder="Email address" ng-model="form.datas.email" /></div>
 						</div>
 						<div class="row">
 							<div class="label">Password</div>
-							<div class="input"><input type="password" placeholder="Password" ng-model="user.password" class="input-settings" /></div>
+							<div class="input"><input type="password" placeholder="Password" ng-model="form.datas.password" /></div>
 						</div>
 						<div class="row">
-							<input type="submit" value="Update informations" />
+							<input type="submit" value="Save informations" />
 						</div>
 					</form>
 				</div>

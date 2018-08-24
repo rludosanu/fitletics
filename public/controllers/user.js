@@ -1,177 +1,484 @@
 (function() {
   var app = angular.module('my-app', ['ngCookies']);
 
-  // Make cookies global over the domain
+  /*****************************************************************************
+  **
+  ** Make cookies global over the domain
+  **
+  *****************************************************************************/
   app.config(function($cookiesProvider) {
     $cookiesProvider.defaults.path = '/';
     $cookiesProvider.defaults.domain = '192.168.1.26';
   });
 
-  /*
+  /*****************************************************************************
+  **
   ** Index
-  */
+  **
+  *****************************************************************************/
   app.controller('userIndex', function($scope, $window) {
+    /* Redirect to sign up */
     $scope.signup = function() {
       $window.location.href = '/signup';
     };
 
+    /* Redirect to sign in */
     $scope.signin = function() {
       $window.location.href = '/signin';
     };
   });
 
-  /*
+  /*****************************************************************************
+  **
   ** Signin
-  */
+  **
+  *****************************************************************************/
   app.controller('userSignin', function($scope, $http, $window, $cookies) {
-    $scope.user = {
-      username: 'rludosanu',
-      password: 'ludosanu'
+    /* Redirect to password reset */
+    $scope.reset = function() {
+      $window.location.href = '/reset/password';
     };
 
+    /* Validation popup */
     $scope.validation = {
       display: false,
-      title: '',
-      context: ''
+      title: 'Error',
+      context: '',
+      trigger: function(context) {
+        this.display = true;
+        this.context = context;
+      }
     };
 
-    $scope.reset = function() {
-      $window.location.href = '/reset';
-    };
+    /* Form datas */
+    $scope.form = {
+      /* Datas values */
+      datas: {
+        username: 'rludosanu',
+        password: 'ludosanu'
+      },
+      /* Reset datas values */
+      reset: function() {
+        var self = this;
+        var keys = Object.keys(self.datas);
 
-    $scope.signin = function() {
-      $http({
-        method: 'POST',
-        url: 'http://192.168.1.26:3000/api/user/signin',
-        data: {
-          username: $scope.user.username,
-          password: $scope.user.password,
+        for (var i = 0 ; i < keys.length ; i++) {
+          self.datas[keys[i]] = '';
         }
-      })
-      .then((result) => {
-        $cookies.put('token', result.data.token);
-        $window.location.href = '/dashboard';
-      })
-      .catch((error) => {
-        $scope.validation = {
-          display: true,
-          title: 'Error',
-          context: error.data.error
-        };
-      });
-    }
+      },
+      /* Pre-validate datas values */
+      validate: function() {
+        var self = this;
+
+        if (!$scope.user.username) {
+          $scope.validation.trigger('Username is not allowed to be empty.');
+        } else if (!$scope.user.password || $scope.user.password.length < 6) {
+          $scope.validation.trigger('Password is not allowed to be empty and less than 6 characters long.');
+        } else {
+          return true;
+        }
+        return false;
+      },
+      /* Send datas to API */
+      submit: function() {
+        var self = this;
+
+        if (!self.validate())
+          return ;
+
+        $http({
+          method: 'POST',
+          url: 'http://192.168.1.26:3000/api/user/signin',
+          data: {
+            username: self.datas.username,
+            password: self.datas.password,
+          }
+        })
+        .then(result => {
+          $cookies.put('token', result.data.token);
+          $window.location.href = '/dashboard';
+        })
+        .catch(error => {
+          $scope.validation.trigger(false, error.data.error);
+        });
+      }
+    };
   });
 
-  /*
+  /*****************************************************************************
+  **
   ** Signup
-  */
+  **
+  *****************************************************************************/
   app.controller('userSignup', function($scope, $http, $window) {
-    $scope.user = {
-      firstName: 'Razvan',
-      lastName: 'Ludosanu',
-      username: 'rludosanu',
-      email: 'r.ludosanu@gmail.com',
-      password: 'ludosanu'
-    };
-
-    $scope.validation = {
-      display: false,
-      title: '',
-      context: ''
-    };
-
+    /* Redirect to signin */
     $scope.signin = function() {
       $window.location.href = '/signin';
     };
 
-    $scope.signup = function() {
-      $http({
-        method: 'POST',
-        url: 'http://192.168.1.26:3000/api/user/signup',
-        data: {
-          firstName: $scope.user.firstName,
-          lastName: $scope.user.lastName,
-          username: $scope.user.username,
-          email: $scope.user.email,
-          password: $scope.user.password
-        }
-      })
-      .then((result) => {
-        $scope.validation = {
-          display: true,
-          title: 'Account created',
-          context: result.data.success
-        };
-
-        $scope.user = {
-          firstName: '',
-          lastName: '',
-          username: '',
-          email: '',
-          password: ''
-        };
-      })
-      .catch((error) => {
-        console.error(error);
-
-        $scope.validation = {
-          display: true,
-          title: 'Form error',
-          context: error.data.error
-        };
-      });
-    }
-  });
-
-  /*
-  ** Reset
-  */
-  app.controller('userReset', function($scope, $http, $window, $cookies) {
-    $scope.user = {
-      email: 'r.ludosanu@gmail.com'
-    };
-
+    /* Validation popup */
     $scope.validation = {
       display: false,
       title: '',
-      context: ''
+      context: '',
+      trigger: function(success, context) {
+        this.display = true;
+        this.title = (success) ? 'Account created' : 'Error';
+        this.context = context;
+      }
     };
 
-    $scope.reset = function() {
-      $http({
-        method: 'PUT',
-        url: 'http://192.168.1.26:3000/api/user/reset',
-        data: {
-          email: $scope.user.email
+    /* Form datas */
+    $scope.form = {
+      /* Datas values */
+      datas: {
+        firstName: 'Razvan',
+        lastName: 'Ludosanu',
+        username: 'rludosanu',
+        email: 'r.ludosanu@gmail.com',
+        password: 'ludosanu'
+      },
+      /* Reset all datas values */
+      reset: function() {
+        var self = this;
+        var keys = Object.keys(self.datas);
+
+        for (var i = 0 ; i < keys.length ; i++) {
+          self.datas[keys[i]] = '';
         }
-      })
-      .then((result) => {
-        $scope.validation = {
-          display: true,
-          title: 'Password reset',
-          context: 'Your password has been reset. Check your emails.'
-        };
+      },
+      /* Pre-validate data values */
+      validate: function() {
+        var self = this;
 
-        $scope.user = {
-          email: ''
-        };
-      })
-      .catch((error) => {
-        console.error(error);
+        if (!$scope.user.firstName) {
+          $scope.validation.trigger(false, 'First name is not allowed to be empty.');
+        } else if (!$scope.user.lastName) {
+          $scope.validation.trigger(false, 'Last name is not allowed to be empty.');
+        } else if (!$scope.user.username) {
+          $scope.validation.trigger(false, 'Username is not allowed to be empty.');
+        } else if (!$scope.user.email) {
+          $scope.validation.trigger(false, 'Email address is not allowed to be empty.');
+        } else if (!$scope.user.password || $scope.user.password.length < 6) {
+          $scope.validation.trigger(false, 'Password is not allowed to be empty and less than 6 characters long.');
+        } else {
+          return true;
+        }
+        return false;
+      },
+      /* Send datas to API */
+      submit: function() {
+        var self = this;
 
-        $scope.validation = {
-          display: true,
-          title: 'Reset error',
-          context: 'Internal database error or user email doesn\'t exist.'
-        };
-      });
-    }
+        if (!self.validate())
+          return ;
+
+        $http({
+         method: 'POST',
+         url: 'http://192.168.1.26:3000/api/user/signup',
+         data: {
+           firstName: self.datas.firstName,
+           lastName: self.datas.lastName,
+           username: self.datas.username,
+           email: self.datas.email,
+           password: self.datas.password
+         }
+       })
+       .then(result => {
+         $scope.validation.trigger(true, 'Your account has been created, check your emails to activate it.');
+         self.reset();
+       })
+       .catch(error => {
+         $scope.validation.trigger(false, error.data.error);
+       });
+      }
+    };
   });
 
-  /*
-  ** Activate
-  */
-  app.controller('userActivate', function($scope, $http, $window, $location, $cookies) {
+  /*****************************************************************************
+  **
+  ** Update Profile
+  **
+  *****************************************************************************/
+  app.controller('userUpdateProfile', function($scope, $http) {
+    /* Validation popup */
+    $scope.validation = {
+      display: false,
+      title: '',
+      context: '',
+      trigger: function(success, context) {
+        this.display = true;
+        this.title = (success) ? 'Profile updated' : 'Error';
+        this.context = context;
+      }
+    };
+
+    /* Form */
+    $scope.form = {
+      /* Data values */
+      datas: {
+        firstName: '',
+        lastName: '',
+        username: '',
+        email: '',
+        password: ''
+      },
+      /* Pre-valide datas */
+      validate: function() {
+        var self = this;
+
+        if (!self.datas.firstName) {
+          $scope.validation.trigger(false, 'First name is not allowed to be empty.');
+        } else if (!self.datas.lastName) {
+          $scope.validation.trigger(false, 'Last name is not allowed to be empty.');
+        } else if (!self.datas.username) {
+          $scope.validation.trigger(false, 'Username is not allowed to be empty.');
+        } else if (!self.datas.email) {
+          $scope.validation.trigger(false, 'Email address is not allowed to be empty.');
+        } else if (!self.datas.password || self.datas.password.length < 6) {
+          $scope.validation.trigger(false, 'Password is not allowed to be empty and less than 6 characters long.');
+        } else {
+          return true;
+        }
+        return false;
+      },
+      /* Fetch datas from API */
+      fetch: function() {
+        var self = this;
+
+        $http({
+          method: 'POST',
+          url: 'http://192.168.1.26:3000/api/user/read'
+        })
+        .then(result => {
+          var keys = Object.keys(result.data);
+
+          for (var i = 0 ; i < keys.length ; i++) {
+            self.datas[keys[i]] = result.data[keys[i]];
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          popValidation(false, error.data.error, 'Database error');
+        });
+      },
+      /* Send datas to API */
+      submit: function() {
+        var self = this;
+
+        if (!self.validate())
+          return ;
+
+        $http({
+          method: 'PUT',
+          url: 'http://192.168.1.26:3000/api/user/update/profile',
+          data: {
+            firstName: self.datas.firstName,
+            lastName: self.datas.lastName,
+            username: self.datas.username,
+            email: self.datas.email,
+            password: self.datas.password
+          }
+        })
+        .then(result => {
+          console.log(result);
+          $scope.validation.trigger(true, 'Your profile account informations have been saved.')
+          self.datas.password = '';
+        })
+        .catch(error => {
+          console.error(error.data.error);
+          $scope.validation.trigger(false, error.data.error);
+        });
+      }
+    };
+
+    $scope.form.fetch();
+  });
+
+  /*****************************************************************************
+  **
+  ** Update Password
+  **
+  *****************************************************************************/
+  app.controller('userUpdatePassword', function($scope, $http, $window, $cookies) {
+    /* Validation popup */
+    $scope.validation = {
+      display: false,
+      title: '',
+      context: '',
+      trigger: function(success, context) {
+        this.display = true;
+        this.title = (success) ? 'All good' : 'Validation error';
+        this.context = context;
+      }
+    };
+
+    /* Form */
+    $scope.form = {
+      /* Datas values */
+      datas: {
+        password: '',
+        newPassword: '',
+        newPasswordConfirmation: '',
+      },
+      /* Pre-validate datas*/
+      validate: function() {
+        var self = this;
+
+        if (!self.datas.password || self.datas.password.length < 6) {
+          $scope.validation.trigger(false, 'Password is not allowed to be empty and less than 6 characters long.');
+        } else if (!self.datas.newPassword || self.datas.newPassword.length < 6) {
+          $scope.validation.trigger(false, 'New password is not allowed to be empty and less than 6 characters long.');
+        } else if (!self.datas.newPasswordConfirmation || self.datas.newPasswordConfirmation.length < 6) {
+          $scope.validation.trigger(false, 'New password confirmation is not allowed to be empty and less than 6 characters long.');
+        } else if (self.datas.newPassword !== self.datas.newPasswordConfirmation) {
+          $scope.validation.trigger(false, 'New password and new password confirmation must be identical.');
+        } else if (self.datas.password === self.datas.newPassword) {
+          $scope.validation.trigger(false, 'Actual and new passwords must be different.');
+        } else {
+          return true
+        }
+        return false;
+      },
+      /* Reset all datas values */
+      reset: function() {
+        var self = this;
+        var keys = Object.keys(self.datas);
+
+        for (var i = 0 ; i < keys.length ; i++) {
+          self.datas[keys[i]] = '';
+        }
+      },
+      /* Send datas to API */
+      submit: function() {
+        var self = this;
+
+        if (!self.validate())
+          return ;
+
+        $http({
+          method: 'PUT',
+          url: 'http://192.168.1.26:3000/api/user/update/password',
+          data: {
+            password: self.datas.password,
+            newPassword: self.datas.newPassword
+          }
+        })
+        .then(result => {
+          $scope.validation.trigger(true, 'Your new password has been saved.');
+          self.reset();
+        })
+        .catch(error => {
+          $scope.validation.trigger(false, error.data.error);
+        });
+      }
+    };
+  });
+
+  /*****************************************************************************
+  **
+  ** Reset Password
+  **
+  *****************************************************************************/
+  app.controller('userResetPassword', function($scope, $http) {
+    /* Validation popup */
+    $scope.validation = {
+      display: false,
+      title: '',
+      context: '',
+      trigger: function(success, context) {
+        this.display = true;
+        this.title = (success) ? 'Password reset' : 'Validation error';
+        this.context = context;
+      }
+    };
+
+    /* Form */
+    $scope.form = {
+      /* Datas values */
+      datas: {
+        email: 'r.ludosanu@gmail.com'
+      },
+      /* Pre-validate datas */
+      validate: function() {
+        var self = this;
+
+        if (!self.datas.email) {
+          $scope.validation.trigger(false, 'Email address is not allowed to be empty');
+        } else {
+          return true;
+        }
+        return false;
+      },
+      /* Send datas to API */
+      submit: function() {
+        var self = this;
+
+        if (!self.validate())
+          return ;
+
+        $http({
+          method: 'PUT',
+          url: 'http://192.168.1.26:3000/api/user/reset/password',
+          data: {
+            email: $scope.form.datas.email
+          }
+        })
+        .then(result => {
+          $scope.validation.trigger(true, 'Your password has been reset. Check your emails.');
+          $scope.form.datas.email = '';
+        })
+        .catch(error => {
+          $scope.validation.trigger(false, error.data.error);
+        });
+      }
+    };
+  });
+
+  /*****************************************************************************
+  **
+  ** Get Trainings
+  **
+  *****************************************************************************/
+  app.controller('userProfile', function($scope, $http, $cookies, $window) {
+    $scope.trainings = [];
+    $scope.countTrainings = 0;
+
+    /* Fetch trainings from database */
+    $http({
+      method: 'POST',
+      url: 'http://192.168.1.26:3000/api/training/read'
+    })
+    .then(result => {
+      $scope.trainings = result.data;
+      $scope.countTrainings = $scope.trainings.length;
+    })
+    .catch(error => {
+      console.error(error.data.error);
+    });
+
+    /* Sign out and removes cookies */
+    $scope.signout = function() {
+      var cookies = $cookies.getAll();
+      var total = Object.keys(cookies).length;
+      var current = 0;
+
+      angular.forEach(cookies, function (v, k) {
+        $cookies.remove(k);
+        current++;
+        if (current == total) {
+          $window.location.href = '/';
+        }
+      });
+    };
+  });
+
+  /*****************************************************************************
+  **
+  ** Activate Account
+  **
+  *****************************************************************************/
+  app.controller('userActivate', function($scope, $http, $location) {
     var url = $location.absUrl().split('/');
     var token = url[url.length - 1];
 
@@ -187,126 +494,17 @@
         token: token
       }
     })
-    .then((result) => {
+    .then(result => {
       $scope.validation = {
         success: true,
         error: false
       };
     })
-    .catch((error) => {
+    .catch(error => {
       $scope.validation = {
         success: false,
         error: true
       };
     });
-  });
-
-  /*
-  ** Update
-  */
-  app.controller('userUpdate', function($scope, $http, $window, $cookies) {
-    // User datas
-    $scope.user = {
-      firstName: '',
-      lastName: '',
-      username: '',
-      email: '',
-      password: ''
-    };
-
-    // Validation feedback popup
-    $scope.validation = {
-      display: false,
-      title: '',
-      context: ''
-    };
-
-    // Request user datas
-    $http({
-      method: 'POST',
-      url: 'http://192.168.1.26:3000/api/user/read'
-    })
-    .then((result) => {
-      $scope.user = {
-        firstName: result.data.firstName,
-        lastName: result.data.lastName,
-        username: result.data.username,
-        email: result.data.email
-      };
-    })
-    .catch((error) => {
-      $scope.validation = {
-        display: true,
-        title: 'Error',
-        context: error.data.error
-      };
-    });
-
-    // Send user datas
-    $scope.update = function() {
-      $http({
-        method: 'PUT',
-        url: 'http://192.168.1.26:3000/api/user/update',
-        data: {
-          firstName: $scope.user.firstName,
-          lastName: $scope.user.lastName,
-          username: $scope.user.username,
-          email: $scope.user.email,
-          password: $scope.user.password
-        }
-      })
-      .then((result) => {
-        $scope.validation = {
-          display: true,
-          title: 'All good',
-          context: 'Your personal account informations have been saved.'
-        };
-        $scope.user.password = '';
-      })
-      .catch((error) => {
-        console.error(error.data.error);
-        $scope.validation = {
-          display: true,
-          title: 'Oops...',
-          context: error.data.error
-        };
-      });
-    }
-  });
-
-  /*
-  ** Get informations and trainings
-  */
-  app.controller('userProfile', function($scope, $http, $cookies, $window) {
-    $scope.trainings = [];
-    $scope.countTrainings = 0;
-
-    // Fetch trainings from database
-    $http({
-      method: 'POST',
-      url: 'http://192.168.1.26:3000/api/training/read'
-    })
-    .then((result) => {
-      $scope.trainings = result.data;
-      $scope.countTrainings = $scope.trainings.length;
-    })
-    .catch((error) => {
-      console.error(error.data.error);
-    });
-
-    // Sign out from current session and removes all cookies
-    $scope.signout = function() {
-      var cookies = $cookies.getAll();
-      var total = Object.keys(cookies).length;
-      var current = 0;
-
-      angular.forEach(cookies, function (v, k) {
-        $cookies.remove(k);
-        current++;
-        if (current == total) {
-          $window.location.href = '/';
-        }
-      });
-    };
   });
 })();

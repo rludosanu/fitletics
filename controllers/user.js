@@ -14,15 +14,26 @@ module.exports = class User {
     this.blacklistedTokens = [];
 	}
 
-	/*
-  ** Signup
+  /*****************************************************************************
+  ** ROUTE
+  **    POST /api/user/signup
+  **
+  ** DESCRIPTION
   **    Create a new user account and send an activation link.
-  */
+  **
+  ** SUCCESS
+  **    200 : User account created.
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    500 : Password encryption failed
+  **    500 : Database insert failed
+  *****************************************************************************/
 	signup(req, res) {
     var datas = req.body;
     var self = this;
 
-    // Validate data format
+    /* Validate datas format */
     joi.validate(datas, joi.object().keys({
     	firstName: joi.string().required(),
       lastName: joi.string().required(),
@@ -30,38 +41,33 @@ module.exports = class User {
       email: joi.string().email().required(),
       password: joi.string().min(6).required()
     }), (error, result) => {
-      // Invalid data format
+      /* Invalid data format */
       if (error) {
-        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
       }
 
-      // Encrypt password
+      /* Encrypt password */
       bcrypt.hash(datas.password, 10, function(error, hash) {
-        // Password encryption error
+        /* Password encryption failed */
         if (error) {
-          console.error(error);
           return res.status(500).json({
             error: 'Unable to encrypt password'
           });
         }
 
-        // Encrypted password
-        datas.password = hash;
-
-        // Insert into database
+        /* Insert user into database */
         self._app.models.user.model.build({
           firstName: datas.firstName,
           lastName: datas.lastName,
           username: datas.username,
           email: datas.email,
-          password: datas.password
+          password: hash
         })
         .save()
-        .then((user) => {
-          // Send the account confirmation link
+        .then(user => {
+          /* Send account confirmation link */
           nodemailer.createTransport(self._app.config.mail).sendMail({
           	from: 'Fitletics Coach<fitleticscoach@gmail.com>',
           	to: datas.email,
@@ -89,13 +95,13 @@ module.exports = class User {
           	`
           });
 
-          // Return a success message
+          /* OK */
           res.status(200).json({
             success: 'Congratulations, you are a Fitletics Coach subscriber. Check your emails to activate your account.'
           });
         })
+        /* Database insert failed */
         .catch((error) => {
-          console.error(error);
           res.status(500).json({
             error: 'Database query error'
           });
@@ -104,77 +110,87 @@ module.exports = class User {
     });
 	}
 
-  /*
-  ** Signin
-  **    Check user username and password and return a json web token.
-  */
+  /*****************************************************************************
+  ** ROUTE
+  **    POST /api/user/signin
+  **
+  ** DESCRIPTION
+  **    Checks the couple username:password and returns a new session token.
+  **
+  ** SUCCESS
+  **    200 : User account created.
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    401 : User not found
+  **    403 : Account not active
+  **    401 : Passwords do not match
+  **    500 : Password decryption failed
+  **    500 : Database select failed
+  *****************************************************************************/
   signin(req, res) {
     var datas = req.body;
     var self = this;
 
-    // Validate data format
+    /* Validate data format */
 		joi.validate(datas, joi.object().keys({
       username: joi.string().regex(/^[a-zA-Z0-9_]{6,20}$/).required(),
 			password: joi.string().min(6).required()
 		}), (error, result) => {
-      // Invalid data format
+      /* Invalid data format */
       if (error) {
-        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
       }
 
-      // Match user email in database
+      /* Fetch user from database */
       this._app.models.user.model.findOne({
         where: {
           username: datas.username
         }
       })
-      .then((user) => {
-        // Email not found
+      .then(user => {
+        /* User not found */
         if (!user) {
-          console.error('User account not found');
           return res.status(401).json({
-            error: 'User account not found'
+            error: 'User not found'
           });
         }
-        // Account not activated
+        /* Account not active */
         else if (!user.active) {
-          console.error('User account not active');
           return res.status(403).json({
-            error: 'User account not active'
+            error: 'Account not active'
           });
         }
 
-        // Compare password
+        /* Compare password */
         bcrypt.compare(datas.password, user.password)
-        .then((match) => {
-          // Passwords not matching
+        .then(match => {
+          /* Passwords do not match */
           if (!match) {
-            console.log('Unauthorised access');
             res.status(401).json({
-              error: 'Unauthorised access'
+              error: 'Passwords do not match'
             });
           }
 
-          // Create a new json web token without expiration
+          /* Create new session token */
           var token = jwt.sign({ id: user.id }, self._app.config.jsonwebtoken.secret);
 
-          // Send back token
+          /* OK */
           res.status(200).json({
             token: token
           });
         })
-        .catch((error) => {
-          console.error(error);
+        /* Password decryption failed */
+        .catch(error => {
           res.status(500).json({
-            error: 'Unable to decrypt password'
+            error: 'Password decryption failed'
           });
         });
       })
-      .catch((error) => {
-        console.error(error);
+      /* Database select error */
+      .catch(error => {
         res.status(500).json({
           error: 'Database query error'
         });
@@ -230,18 +246,34 @@ module.exports = class User {
 		});
 	}
 
-	/*
-  ** Update
-  **    Update user account informations using a json web token to retreive user "id".
-  */
-	update(req, res) {
+  /*****************************************************************************
+  ** ROUTE
+  **    PUT /api/user/update/profile
+  **
+  ** DESCRIPTION
+  **    Updates the user's profile informations.
+  **
+  ** SUCCESS
+  **    200 : Profile updated
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    400 : Malformed token
+  **    401 : User not found
+  **    401 : Passwords do not match
+  **    500 : Password encryption failed
+  **    500 : Database select failed
+  **    500 : Password decryption failed
+  **    500 : Database update failed
+  *****************************************************************************/
+	updateProfile(req, res) {
     var datas = req.body;
     var self = this;
 
-    // Add token on datas to validate
+    /* Add session token to datas */
     datas.token = req.cookies.token;
 
-    // Validate datas format
+    /* Validate datas format */
     joi.validate(datas, joi.object().keys({
       firstName: joi.string().required(),
       lastName: joi.string().required(),
@@ -250,49 +282,47 @@ module.exports = class User {
       password: joi.string().min(6).required(),
       token: joi.string().required()
     }), (error, result) => {
-      // Invalid datas format
+      /* Invalid datas format */
       if (error) {
-        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
       }
 
-      // Decrypt json web token
+      /* Session token decryption */
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        // Token not decrypted
+        /* Malformed session token */
         if (error) {
-          console.error(error);
           return res.status(400).json({
             error: error
           });
         }
 
-        // Search user
+        /* Fetch user from database */
         self._app.models.user.model.findOne({
           where: {
             id: decoded.id
           }
         })
         .then((user) => {
-          // User not found
+          /* User not found */
           if (!user) {
             return res.status(401).json({
-              error: 'Invalid session token => User not found'
+              error: 'User not found'
             });
           }
 
-          // Compare passwords
+          /* Compare passwords */
           bcrypt.compare(datas.password, user.dataValues.password)
           .then((match) => {
-            // Passwords not matching
+            /* Passwords do not match */
             if (!match) {
               res.status(401).json({
-                error: 'Invalid password => Passwords do not match'
+                error: 'Passwords do not match'
               });
             }
 
-            // Update database
+            /* Update database */
             user.update({
               firstName: datas.firstName,
               lastName: datas.lastName,
@@ -301,18 +331,24 @@ module.exports = class User {
             })
             .then((rows) => {
               res.status(200).json({
-                success: 'Account informations updated'
+                success: 'Profile updated'
               });
             })
             .catch((error) => {
-              // Update query fucked
+              /* Database updated failed */
               res.status(500).json({
                 error: 'Database query error'
               });
             });
+          })
+          /* Password decryption failed */
+          .catch((error) => {
+            res.status(500).json({
+              error: 'Password decryption failed'
+            });
           });
         })
-        // Find query fucked
+        /* Database fetch failed */
         .catch((error) => {
           res.status(500).json({
             error: 'Database query error'
@@ -322,63 +358,191 @@ module.exports = class User {
     });
 	}
 
-  /*
-	** Activate
-	**   Activate user account by setting user "active" column to TRUE.
-	*/
-	activate(req, res) {
+  /*****************************************************************************
+  ** ROUTE
+  **    PUT /api/user/update/password
+  **
+  ** DESCRIPTION
+  **    Updates the user's "password" column in database with $newPassword.
+  **
+  ** SUCCESS
+  **    200 : The $newPassword has been saved
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    400 : Malformed token
+  **    401 : User not found
+  **    401 : Passwords do not match
+  **    500 : Password encryption failed
+  **    500 : Database select failed
+  **    500 : Database update failed
+  **    500 : Password decryption failed
+  *****************************************************************************/
+  updatePassword(req, res) {
     var datas = req.body;
     var self = this;
 
-    // Validate datas format
-		joi.validate(datas, joi.object().keys({
-			token: joi.string().required()
-		}), (error, result) => {
-      // Invalid datas format
+    /* Add session token to datas object */
+    datas.token = req.cookies.token;
+
+    /* Validate datas format */
+    joi.validate(datas, joi.object().keys({
+      password: joi.string().min(6).required(),
+      newPassword: joi.string().min(6).required(),
+      token: joi.string().required()
+    }), (error, result) => {
+      /* Invalid datas format */
       if (error) {
-        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
       }
 
-      // Update database entry
+      /* Session token decryption */
+      jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
+        /* Malformed session token */
+        if (error) {
+          return res.status(400).json({
+            error: error
+          });
+        }
+
+        /* Select user by id using decoded session token */
+        self._app.models.user.model.findOne({
+          where: {
+            id: decoded.id
+          }
+        })
+        .then(user => {
+          /* User not found in database */
+          if (!user) {
+            return res.status(401).json({
+              error: 'User not found'
+            });
+          }
+
+          /* Compare passwords */
+          bcrypt.compare(datas.password, user.dataValues.password)
+          .then((match) => {
+            /* Passwords do not match */
+            if (!match) {
+              res.status(401).json({
+                error: 'Passwords do not match'
+              });
+            }
+
+            /* Encrypt new password */
+            bcrypt.hash(datas.newPassword, 10, function(error, hash) {
+              /* Password encryption failed */
+              if (error) {
+                return res.status(500).json({
+                  error: 'Password encryption failed'
+                });
+              }
+
+              /* Update user password with encrypted hash */
+              user.update({
+                password: hash
+              })
+              .then((rows) => {
+                res.status(200).json({
+                  success: 'Password updated'
+                });
+              })
+              .catch((error) => {
+                /* Database update failed */
+                res.status(500).json({
+                  error: 'Database query error'
+                });
+              });
+            });
+          })
+          /* Password decryption failed */
+          .catch((error) => {
+            res.status(500).json({
+              error: 'Password decryption failed'
+            });
+          });
+        })
+        /* Database select failed */
+        .catch((error) => {
+          res.status(500).json({
+            error: 'Database query error'
+          });
+        });
+      });
+    });
+  }
+
+  /*****************************************************************************
+  ** ROUTE
+  **    PUT /api/user/activate
+  **
+  ** DESCRIPTION
+  **    Activate user account.
+  **
+  ** SUCCESS
+  **    200 : User account activated.
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    401 : Invalid activation token
+  **    401 : Account already active
+  **    500 : Database select failed
+  **    500 : Database update failed
+  *****************************************************************************/
+	activate(req, res) {
+    var datas = req.body;
+    var self = this;
+
+    /* Validate datas format */
+		joi.validate(datas, joi.object().keys({
+			token: joi.string().required()
+		}), (error, result) => {
+      /* Invalid datas format */
+      if (error) {
+        return res.status(400).json({
+          error: error.details[0].message
+        });
+      }
+
+      /* Fetch user from database */
       self._app.models.user.model.findOne({
         active: false,
         activationToken: datas.token
       })
-      .then((user) => {
+      .then(user => {
+        /* Invalid activation token */
         if (!user) {
-          console.error('Invalid activation token');
           return res.status(401).json({
             error: 'Invalid activation token'
           });
         } else if (user.active) {
-          console.error('User account already active');
           return res.status(401).json({
-            error: 'User account already active'
+            error: 'Account already active'
           });
         }
 
+        /* Update user in database */
         user.update({
           active: true,
   				activationToken: null
         })
         .then((rows) => {
-          // OK
+          /* OK */
           res.status(200).json({
-            success: 'User account activated'
+            success: 'Account activated'
           });
         })
+        /* Database update failed */
         .catch((error) => {
-          console.error(error);
           res.status(500).json({
             error: 'Database query error'
           });
         });
       })
+      /* Database select failed */
       .catch((error) => {
-        console.error(error);
         res.status(500).json({
           error: 'Database query error'
         });
@@ -386,37 +550,47 @@ module.exports = class User {
     });
 	}
 
-	/*
-  ** Deactivate
-  **    Deactivate user account without deleting anything by setting user "active" column to FALSE.
-  */
+  /*****************************************************************************
+  ** ROUTE
+  **    PUT /api/user/deactivate
+  **
+  ** DESCRIPTION
+  **    Deactivate account without deleting records.
+  **
+  ** SUCCESS
+  **    200 : Account deactivated.
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    400 : Session token decryption failed
+  **    401 : User not found or account already deactivated
+  **    500 : Database update failed
+  *****************************************************************************/
 	deactivate(req, res) {
     var datas = req.cookies;
     var self = this;
 
-    // Validate datas format
+    /* Validate datas format */
     joi.validate(datas, joi.object().keys({
       token: joi.string().required(),
     }), (error, result) => {
-      // Invalid datas format
+      /* Invalid datas format */
       if (error) {
-        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
       }
 
-      // Decrypt json web token
+      /* Decrypt session token */
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        // Token not decrypted
+        /* Session token decryption failed */
         if (error) {
-          console.error(error);
           return res.status(400).json({
             error: error
           });
         }
 
-        // Update database entry
+        /* Update database */
         self._app.models.user.model.update({
           active: false
         }, {
@@ -425,21 +599,20 @@ module.exports = class User {
           }
         })
         .then(rows => {
-          // Token not found
+          /* User not found or account already deactivated */
   				if (!rows[0]) {
-            console.error('Invalid activation token');
             return res.status(401).json({
-              error: 'Invalid activation token'
+              error: 'User not found or account already deactivated'
             });
           }
 
-          // OK
+          /* OK */
           res.status(200).json({
-            success: 'User account deactivated'
+            success: 'Account deactivated'
           });
         })
+        /* Database update failed */
         .catch(error => {
-          console.error(error);
           res.status(500).json({
             error: 'Database query error'
           });
@@ -448,11 +621,23 @@ module.exports = class User {
     });
 	}
 
-  /*
-  ** Reset
-  **    Reset user password and send it by email.
-  */
-  reset(req, res) {
+  /*****************************************************************************
+  ** ROUTE
+  **    PUT /api/user/reset/password
+  **
+  ** DESCRIPTION
+  **    Reset user's password and send it by email.
+  **
+  ** SUCCESS
+  **    200 : Password reset.
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    500 : Password encryption failed
+  **    401 : User not found
+  **    500 : Database update failed
+  *****************************************************************************/
+  resetPassword(req, res) {
     var datas = req.body;
     var self = this;
     var generatePassword = function() {
@@ -467,29 +652,27 @@ module.exports = class User {
     };
     var newPassword = generatePassword();
 
-    // Validate data format
+    /* Validate data format */
     joi.validate(datas, joi.object().keys({
       email: joi.string().email().required(),
     }), (error, result) => {
-      // Invalid data format
+      /* Invalid data format */
       if (error) {
-        console.error(error);
         return res.status(400).json({
           error: error.details[0].message
         });
       }
 
-      // Encrypt password
+      /* Encrypt new password */
       bcrypt.hash(newPassword, 10, function(error, hash) {
-        // Password encryption error
+        /* Password encryption failed */
         if (error) {
-          console.error(error);
           return res.status(500).json({
-            error: 'Unable to encrypt password'
+            error: 'Password encryption failed'
           });
         }
 
-        // Match user email in database
+        /* Update database */
         self._app.models.user.model.update({
           password: hash
         }, {
@@ -497,16 +680,15 @@ module.exports = class User {
             email: datas.email
           }
         })
-        .then((rows) => {
-          // Email not found
+        .then(rows => {
+          /* User not found */
           if (!rows[0]) {
-            console.error('User account not found');
             return res.status(401).json({
-              error: 'User account not found'
+              error: 'User not found'
             });
           }
 
-          // Send the new password
+          /* Send new password by email */
           nodemailer.createTransport(self._app.config.mail).sendMail({
             from: 'Fitletics Coach<fitleticscoach@gmail.com>',
             to: datas.email,
@@ -531,12 +713,13 @@ module.exports = class User {
             `
           });
 
-          // OK
+          /* OK */
           res.status(200).json({
-            success: 'Your password was reset. Check your emails to recover your new password.'
+            success: 'Password reset'
           });
         })
-        .catch((error) => {
+        /* Database update failed */
+        .catch(error => {
           res.status(500).json({
             error: 'Database query error'
           });
