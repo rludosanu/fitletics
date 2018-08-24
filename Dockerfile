@@ -11,8 +11,8 @@ COPY . .
 # Install node modules
 RUN ["npm", "install"]
 
-# Open port 3000
-EXPOSE 3000
+# Open port 4000
+EXPOSE 4000
 
 # To be executed on container startup
 CMD ["npm", "start"]
