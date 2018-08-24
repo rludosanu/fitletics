@@ -7,6 +7,10 @@ class ClientRouter {
   constructor(app) {
     this._app = app;
 
+    /* Setup host and port for view-controllers */
+    this.appHost = this._app.config.server.host;
+    this.appPort = this._app.config.server.port;
+
     /* Valid session token */
     this.isTokenValid = function(req, res, next) {
       var self = this;
@@ -51,27 +55,27 @@ class ClientRouter {
     this.router.use('/public', express.static(path.join(__dirname, '../public')));
 
     /* Unlogged routing */
-    this.router.get('/signout', (req, res) => res.render('signout'));
+    this.router.get('/signout', (req, res) => res.render('signout', { host: this.appHost, port: this.appPort }));
 
-    this.router.get('/', this.isLoggedIn.bind(this), (req, res) => res.render('index'));
-    this.router.get('/signin', this.isLoggedIn.bind(this), (req, res) => res.render('signin'));
-    this.router.get('/signup', this.isLoggedIn.bind(this), (req, res) => res.render('signup'));
-    this.router.get('/activate/:token', this.isLoggedIn.bind(this), (req, res) => res.render('activate'));
-    this.router.get('/reset/password', this.isLoggedIn.bind(this), (req, res) => res.render('user-reset-password'));
+    this.router.get('/', this.isLoggedIn.bind(this), (req, res) => res.render('index', { host: this.appHost, port: this.appPort }));
+    this.router.get('/signin', this.isLoggedIn.bind(this), (req, res) => res.render('signin', { host: this.appHost, port: this.appPort }));
+    this.router.get('/signup', this.isLoggedIn.bind(this), (req, res) => res.render('signup', { host: this.appHost, port: this.appPort }));
+    this.router.get('/activate/:token', this.isLoggedIn.bind(this), (req, res) => res.render('activate', { host: this.appHost, port: this.appPort }));
+    this.router.get('/reset/password', this.isLoggedIn.bind(this), (req, res) => res.render('user-reset-password', { host: this.appHost, port: this.appPort }));
 
     /* Logged routing */
     this.router.get('/dashboard', this.isTokenValid.bind(this), (req, res) => res.render('dashboard'));
-    this.router.get('/coach', this.isTokenValid.bind(this), (req, res) => res.render('coach'));
-    this.router.get('/workout', this.isTokenValid.bind(this), (req, res) => res.render('workout'));
-    this.router.get('/workout/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('workout-preview'));
-    this.router.get('/workout/:id/live', this.isTokenValid.bind(this), (req, res) => res.render('workout-live'));
-    this.router.get('/exercise', this.isTokenValid.bind(this), (req, res) => res.render('exercise'));
-    this.router.get('/exercise/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('exercise-preview'));
-    this.router.get('/exercise/:id/live/:repetitions', this.isTokenValid.bind(this), (req, res) => res.render('exercise-live'));
-    this.router.get('/user/profile', this.isTokenValid.bind(this), (req, res) => res.render('user-profile'));
-    this.router.get('/user/settings', this.isTokenValid.bind(this), (req, res) => res.render('user-settings'));
-    this.router.get('/user/update/password', this.isTokenValid.bind(this), (req, res) => res.render('user-update-password'));
-    this.router.get('/user/update/profile', this.isTokenValid.bind(this), (req, res) => res.render('user-update-profile'));
+    this.router.get('/coach', this.isTokenValid.bind(this), (req, res) => res.render('coach', { host: this.appHost, port: this.appPort }));
+    this.router.get('/workout', this.isTokenValid.bind(this), (req, res) => res.render('workout', { host: this.appHost, port: this.appPort }));
+    this.router.get('/workout/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('workout-preview', { host: this.appHost, port: this.appPort }));
+    this.router.get('/workout/:id/live', this.isTokenValid.bind(this), (req, res) => res.render('workout-live', { host: this.appHost, port: this.appPort }));
+    this.router.get('/exercise', this.isTokenValid.bind(this), (req, res) => res.render('exercise', { host: this.appHost, port: this.appPort }));
+    this.router.get('/exercise/:id/preview', this.isTokenValid.bind(this), (req, res) => res.render('exercise-preview', { host: this.appHost, port: this.appPort }));
+    this.router.get('/exercise/:id/live/:repetitions', this.isTokenValid.bind(this), (req, res) => res.render('exercise-live', { host: this.appHost, port: this.appPort }));
+    this.router.get('/user/profile', this.isTokenValid.bind(this), (req, res) => res.render('user-profile', { host: this.appHost, port: this.appPort }));
+    this.router.get('/user/settings', this.isTokenValid.bind(this), (req, res) => res.render('user-settings', { host: this.appHost, port: this.appPort }));
+    this.router.get('/user/update/password', this.isTokenValid.bind(this), (req, res) => res.render('user-update-password', { host: this.appHost, port: this.appPort }));
+    this.router.get('/user/update/profile', this.isTokenValid.bind(this), (req, res) => res.render('user-update-profile', { host: this.appHost, port: this.appPort }));
 
     /* Error routing */
     this.router.get('/404', (req, res) => res.render('404'));

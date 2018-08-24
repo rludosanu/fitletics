@@ -1,18 +1,41 @@
 (function() {
 	var app = angular.module('my-app', ['ngCookies']);
 
-	/*
-	** List of all available exercises.
-	*/
+	/*****************************************************************************
+  **
+  ** Parse script tag to get server host and port.
+  **
+  *****************************************************************************/
+  var getAppScriptAttributes = function(attrname) {
+    var scripts = document.getElementsByTagName('script');
+    var attrval = null;
+
+    for (var i = 0 ; i < scripts.length ; i++) {
+      attrval = scripts[i].getAttribute(attrname);
+      if (attrval)
+        return attrval;
+    }
+  };
+
+  var appHost = getAppScriptAttributes('app-host');
+  var appPort = getAppScriptAttributes('app-port');
+  var appAddr = appHost + ':' + appPort;
+
+	/*****************************************************************************
+  **
+  ** List of all exercises
+  **
+  *****************************************************************************/
 	app.controller('exerciseList', function($scope, $http) {
+		/* Exercises list */
 		$scope.exercises = [];
 
+		/* Request list to API */
 		$http({
 			method: 'POST',
-			url: 'http://192.168.1.26:3000/api/exercise'
+			url: 'http://' + appAddr + '/api/exercise'
 		})
 		.then(result => {
-			console.log(result);
 			$scope.exercises = result.data;
 		})
 		.catch(error => {
@@ -20,31 +43,37 @@
 		});
 	});
 
-	/*
-	** Exercise preview.
-	*/
+	/*****************************************************************************
+  **
+  ** Preview one exercise
+  **
+  *****************************************************************************/
 	app.controller('exercisePreview', function($scope, $http, $location, $window) {
+		/* Parse url to get exercise id */
 		var url = $location.absUrl().split('/');
-		var id = url[url.length - 2];
+		var exerciseId = url[url.length - 2];
 
+		/* Exercise informations */
 		$scope.exercise = {
-			id: 0,
+			id: -1,
 			name: '',
 			points: 0
 		};
 
+		/* Exercise volume */
 		$scope.volume = 10;
 
+		/* Redirect to exercise training page */
 		$scope.start = function() {
 			$window.location.href = '/exercise/' + $scope.exercise.id + '/live/' + $scope.volume;
 		};
 
+		/* Request informations to API */
 		$http({
 			method: 'POST',
-			url: 'http://192.168.1.26:3000/api/exercise/' + id
+			url: 'http://' + appAddr + '/api/exercise/' + exerciseId
 		})
 		.then(result => {
-			console.log(result);
 			$scope.exercise = result.data;
 		})
 		.catch(error => {
@@ -52,28 +81,30 @@
 		});
 	});
 
-	/*
-	** Live exercise training session.
-	*/
+	/*****************************************************************************
+  **
+  ** Run one exercise as a training
+  **
+  *****************************************************************************/
 	app.controller('exerciseLive', function($scope, $interval, $window, $location, $http) {
+		/* Parse url to get exercise id and volume */
 		var url = $location.absUrl().split('/');
-		var volume = url[url.length - 1];
-		var id = url[url.length - 3];
+		var exerciseId = url[url.length - 3];
+		var exerciseVolume = url[url.length - 1];
 
+		/* Exercise informations */
 		$scope.exercise = {
-			id: -1,
+			id: exerciseId,
 			name: '',
-			volume: volume
+			volume: exerciseVolume
 		};
 
-		$scope.state = {
-			giveup: false
-		};
-
+		/* Training timer */
 		$scope.timer = {
 			counter: 0,
 			timer: '00:00',
 			handle: null,
+			/* Converts a number to a time format */
 			updateHMS() {
 				var self = this;
 				var sec_num = parseInt(self.counter, 10);
@@ -92,6 +123,7 @@
 				else
 					self.timer = hours + ':' + minutes + ':' + seconds;
 			},
+			/* Start the timer */
 			start() {
 				var self = this;
 
@@ -103,6 +135,7 @@
 					self.updateHMS();
 				}, 1000);
 			},
+			/* Stop the timer */
 			stop() {
 				var self = this;
 
@@ -114,10 +147,10 @@
 
 		$scope.buttonText = 'Start';
 
+		/* General state */
 		$scope.state = {
 			state: 'waiting',
 			giveup: false,
-			fullscreen: false,
 			update() {
 				var self = this;
 
@@ -128,11 +161,12 @@
 				} else if (self.state == 'ongoing') {
 					$scope.timer.stop();
 
+					/* Create a new training */
 					$http({
 						method: 'POST',
-						url: 'http://192.168.1.26:3000/api/training/create',
+						url: 'http://' + appAddr + '/api/training/create',
 						data: {
-							exerciseId: parseInt(id),
+							exerciseId: parseInt(exerciseId),
 							volume: parseInt(volume)
 						}
 					})
@@ -141,31 +175,15 @@
 					})
 					.catch(error => console.error(error));
 				}
-			},
-			toggleFullscreen() {
-				console.log('toggleFullscreen');
-				var self = this;
-
-				document.documentElement.requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullScreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
-				document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozExitFullscreen || document.msExitFullscreen;
-
-				if (self.fullscreen == true) {
-					document.exitFullscreen(document);
-					self.fullscreen = false;
-				} else {
-					document.documentElement.requestFullscreen(document.documentElement);
-					self.fullscreen = true;
-				}
 			}
 		};
 
+		/* Get exercise informations */
 		$http({
 			method: 'POST',
-			url: 'http://192.168.1.26:3000/api/exercise/' + id
+			url: 'http://' + appAddr + '/api/exercise/' + id
 		})
 		.then(result => {
-			console.log(result);
-			$scope.exercise.id = result.data.id;
 			$scope.exercise.name = result.data.name;
 		})
 		.catch(error => console.error(error));

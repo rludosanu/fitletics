@@ -3,12 +3,32 @@
 
   /*****************************************************************************
   **
+  ** Parse script tag to get server host and port.
+  **
+  *****************************************************************************/
+  var getAppScriptAttributes = function(attrname) {
+    var scripts = document.getElementsByTagName('script');
+    var attrval = null;
+
+    for (var i = 0 ; i < scripts.length ; i++) {
+      attrval = scripts[i].getAttribute(attrname);
+      if (attrval)
+        return attrval;
+    }
+  };
+
+  var appHost = getAppScriptAttributes('app-host');
+  var appPort = getAppScriptAttributes('app-port');
+  var appAddr = appHost + ':' + appPort;
+
+  /*****************************************************************************
+  **
   ** Make cookies global over the domain
   **
   *****************************************************************************/
   app.config(function($cookiesProvider) {
     $cookiesProvider.defaults.path = '/';
-    $cookiesProvider.defaults.domain = '192.168.1.26';
+    $cookiesProvider.defaults.domain = appHost;
   });
 
   /*****************************************************************************
@@ -88,7 +108,7 @@
 
         $http({
           method: 'POST',
-          url: 'http://192.168.1.26:3000/api/user/signin',
+          url: 'http://' + appAddr + '/api/user/signin',
           data: {
             username: self.datas.username,
             password: self.datas.password,
@@ -175,7 +195,7 @@
 
         $http({
          method: 'POST',
-         url: 'http://192.168.1.26:3000/api/user/signup',
+         url: 'http://' + appAddr + '/api/user/signup',
          data: {
            firstName: self.datas.firstName,
            lastName: self.datas.lastName,
@@ -271,7 +291,7 @@
 
         $http({
           method: 'POST',
-          url: 'http://192.168.1.26:3000/api/user/read'
+          url: 'http://' + appAddr + '/api/user/read'
         })
         .then(result => {
           var keys = Object.keys(result.data);
@@ -293,7 +313,7 @@
 
         $http({
           method: 'PUT',
-          url: 'http://192.168.1.26:3000/api/user/update/profile',
+          url: 'http://' + appAddr + '/api/user/update/profile',
           data: {
             firstName: self.datas.firstName,
             lastName: self.datas.lastName,
@@ -378,7 +398,7 @@
 
         $http({
           method: 'PUT',
-          url: 'http://192.168.1.26:3000/api/user/update/password',
+          url: 'http://' + appAddr + '/api/user/update/password',
           data: {
             password: self.datas.password,
             newPassword: self.datas.newPassword
@@ -439,7 +459,7 @@
 
         $http({
           method: 'PUT',
-          url: 'http://192.168.1.26:3000/api/user/reset/password',
+          url: 'http://' + appAddr + '/api/user/reset/password',
           data: {
             email: $scope.form.datas.email
           }
@@ -467,7 +487,7 @@
     /* Fetch trainings from database */
     $http({
       method: 'POST',
-      url: 'http://192.168.1.26:3000/api/training/read'
+      url: 'http://' + appAddr + '/api/training/read'
     })
     .then(result => {
       $scope.trainings = result.data;
@@ -494,7 +514,7 @@
 
     $http({
       method: 'PUT',
-      url: 'http://192.168.1.26:3000/api/user/activate',
+      url: 'http://' + appAddr + '/api/user/activate',
       data: {
         token: token
       }

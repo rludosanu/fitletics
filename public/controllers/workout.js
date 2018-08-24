@@ -1,20 +1,40 @@
 (function() {
 	var app = angular.module('my-app', ['ngCookies']);
 
-	/*
-	** workoutList
-	**		List of all available workouts.
-	*/
+	/*****************************************************************************
+  **
+  ** Parse script tag to get server host and port.
+  **
+  *****************************************************************************/
+  var getAppScriptAttributes = function(attrname) {
+    var scripts = document.getElementsByTagName('script');
+    var attrval = null;
+
+    for (var i = 0 ; i < scripts.length ; i++) {
+      attrval = scripts[i].getAttribute(attrname);
+      if (attrval)
+        return attrval;
+    }
+  };
+
+  var appHost = getAppScriptAttributes('app-host');
+  var appPort = getAppScriptAttributes('app-port');
+  var appAddr = appHost + ':' + appPort;
+
+	/*****************************************************************************
+  **
+  ** List of all workouts
+  **
+  *****************************************************************************/
 	app.controller('workoutList', function($scope, $http) {
 		$scope.workouts = [];
 		$scope.workoutRounds = 0;
 
 		$http({
 			method: 'POST',
-			url: 'http://192.168.1.26:3000/api/workout/'
+			url: 'http://' + appAddr + '/api/workout/'
 		})
 		.then(result => {
-			console.log(result);
 			$scope.workouts = result.data;
 		})
 		.catch(error => {
@@ -22,10 +42,11 @@
 		});
 	});
 
-	/*
-	** workoutPreview
-	**		Preview of a workout.
-	*/
+	/*****************************************************************************
+	**
+	** Preview of a workout.
+	**
+	*****************************************************************************/
 	app.controller('workoutPreview', function($scope, $http, $location, $window) {
 		var url = $location.absUrl().split('/');
 		var id = url[url.length - 2];
@@ -58,7 +79,7 @@
 
 		$http({
 			method: 'POST',
-			url: 'http://192.168.1.26:3000/api/workout/' + id
+			url: 'http://' + appAddr + '/api/workout/' + id
 		})
 		.then(result => {
 			console.log(result);
@@ -70,10 +91,11 @@
 		});
 	});
 
-	/*
-	** workoutLive
-	**		Live workout training session.
-	*/
+	/*****************************************************************************
+	**
+	** Run a workout as a training.
+	**
+	*****************************************************************************/
 	app.controller('workoutLive', function($scope, $interval, $window, $location, $http) {
 		var url = $location.absUrl().split('/');
 		var id = url[url.length - 2];
@@ -81,10 +103,9 @@
 
 		$http({
 			method: 'POST',
-			url: 'http://192.168.1.26:3000/api/workout/' + id
+			url: 'http://' + appAddr + '/api/workout/' + id
 		})
 		.then(result => {
-			console.log(result);
 			workout = result.data;
 
 			$scope.workout = {
@@ -229,7 +250,6 @@
 			$scope.state = {
 				state: 'waiting',
 				giveup: false,
-				fullscreen: false,
 				update() {
 					var self = this;
 
@@ -248,7 +268,7 @@
 					} else if (self.state == 'finished') {
 						$http({
 							method: 'POST',
-							url: 'http://192.168.1.26:3000/api/training/create',
+							url: 'http://' + appAddr + '/api/training/create',
 							data: {
 								workoutId: parseInt(id),
 								volume: 1
@@ -258,21 +278,6 @@
 							$window.location.href = '/user/profile';
 						})
 						.catch(error => console.error(error));
-					}
-				},
-				toggleFullscreen() {
-					console.log('toggleFullscreen');
-					var self = this;
-
-					document.documentElement.requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullScreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen;
-					document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozExitFullscreen || document.msExitFullscreen;
-
-					if (self.fullscreen == true) {
-						document.exitFullscreen(document);
-						self.fullscreen = false;
-					} else {
-						document.documentElement.requestFullscreen(document.documentElement);
-						self.fullscreen = true;
 					}
 				}
 			};
