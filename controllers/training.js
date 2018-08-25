@@ -3,22 +3,31 @@ const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 
 module.exports = class Training {
-	/*
-  ** Default
-  */
   constructor(app) {
 		this._app = app;
 	}
 
-  /*
-  ** create
-  **    Create a new training.
-  */
+  /*****************************************************************************
+  ** ROUTE
+  **    POST /api/training/create
+  **
+  ** DESCRIPTION
+  **    Create a new training
+  **
+  ** SUCCESS
+  **    200 : Training created
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    404 : Workout not found
+  **    404 : Exercise not found
+  **    500 : Database query error
+  *****************************************************************************/
   create(req, res) {
     var self = this;
     var datas = req.body;
 
-    // Save token
+    // Add session token to datas
     datas.token = req.cookies.token;
 
     // Validate data format
@@ -28,37 +37,33 @@ module.exports = class Training {
       exerciseId: joi.number().integer(),
       volume: joi.number().integer().required(),
     }).or('workoutId', 'exerciseId'), (error, result) => {
-      // Invalid data format
       if (error) {
-        console.error(error);
-        return res.status(400).json({ error: error.details[0].message });
+        // Invalid data format
+        return res.status(400).json(error.details[0].message);
       }
 
-      // Decrypt json web token
+      // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        // Token not decrypted
         if (error) {
-          console.error(error);
-          return res.status(400).json({
-            error: error
-          });
+          // Decryption error
+          return res.status(400).json(error);
         }
 
-        // Workout id is set
+        // Fetch workout
         if (datas.workoutId) {
-          // Fetch the workout
+          // Fetch from database
           self._app.models.workout.model.findOne({
             where: {
               id: datas.workoutId
             }
           })
           .then(workout => {
-            // Workout not found
             if (!workout) {
-              return res.status(404).json({ error: 'Workout not found' });
+              // Workout not found
+              return res.status(404).json('Workout not found');
             }
 
-            // Create a new training entry
+            // Insert into database
             self._app.models.training.model.create({
               userId: decoded.id,
               volume: datas.volume
@@ -67,17 +72,21 @@ module.exports = class Training {
               // Associate workout to training
               training.addWorkouts(workout)
               .then(training => {
-                res.status(200).json({ success: 'Training saved' });
+                // OK
+                res.status(200).json('Training created');
               })
-              .catch(error => res.status(500).json({ error: error.parent }));
+              // Database query error
+              .catch(error => res.status(500).json(error.parent.sqlMessage));
             })
-            .catch(error => res.status(500).json({ error: error.parent }));
+            // Database query error
+            .catch(error => res.status(500).json(error.parent.sqlMessage));
           })
-          .catch(error => res.status(500).json({ error: error.parent }));
+          // Database query error
+          .catch(error => res.status(500).json(error.parent.sqlMessage));
         }
-        // Exercise id is set
+        // Fetch exercise
         else if (datas.exerciseId) {
-          // Fetch the exercise
+          // Fetch from database
           self._app.models.exercise.model.findOne({
             where: {
               id: datas.exerciseId
@@ -86,10 +95,10 @@ module.exports = class Training {
           .then(exercise => {
             // Exercise not found
             if (!exercise) {
-              return res.status(404).json({ error: 'Exercise not found' });
+              return res.status(404).json('Exercise not found');
             }
 
-            // Create a new training entry
+            // Insert into database
             self._app.models.training.model.create({
               userId: decoded.id,
               volume: datas.volume
@@ -98,28 +107,42 @@ module.exports = class Training {
               // Associate exercise to training
               training.addExercises(exercise)
               .then(training => {
-                res.status(200).json({ success: 'Training saved' });
+                // OK
+                res.status(200).json('Training created');
               })
-              .catch(error => res.status(500).json({ error: error.parent }));
+              // Database query error
+              .catch(error => res.status(500).json(error.parent.sqlMessage));
             })
-            .catch(error => res.status(500).json({ error: error.parent }));
+            // Database query error
+            .catch(error => res.status(500).json(error.parent.sqlMessage));
           })
-          .catch(error => res.status(500).json({ error: error.parent }));
+          // Database query error
+          .catch(error => res.status(500).json(error.parent.sqlMessage));
         }
-        // Exercise id and workout id not set
         else {
-          res.status(500).json({ error: 'Invalid workout or exercise id' });
+          // Nothing to fetch
+          res.status(500).json('Invalid training type');
         }
       });
     });
   }
 
-
-
-  /*
-  ** read
-  **    Get all user's trainings
-  */
+  /*****************************************************************************
+  ** ROUTE
+  **    POST /api/training/read
+  **
+  ** DESCRIPTION
+  **    Get all trainings
+  **
+  ** SUCCESS
+  **    200 : List of trainings objects
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    404 : Workout not found
+  **    404 : Exercise not found
+  **    500 : Database query error
+  *****************************************************************************/
   read(req, res) {
     var self = this;
     var datas = req.cookies;
@@ -128,23 +151,19 @@ module.exports = class Training {
     joi.validate(datas, joi.object().keys({
       token: joi.string().required(),
     }), (error, result) => {
-      // Invalid data format
       if (error) {
-        console.error(error);
-        return res.status(400).json({ error: error.details[0].message });
+        // Invalid data format
+        return res.status(400).json(error.details[0].message);
       }
 
-      // Decrypt json web token
+      // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        // Token not decrypted
         if (error) {
-          console.error(error);
-          return res.status(400).json({
-            error: error
-          });
+          // Decryption error
+          return res.status(400).json(error);
         }
 
-        // Read from database
+        // Fetch from database
         self._app.models.training.model.findAll({
           where: {
             userId: decoded.id
@@ -179,9 +198,8 @@ module.exports = class Training {
 
           res.status(200).json(trainings);
         })
-        .catch(error => {
-          res.status(500).json({ error: 'Database query error' });
-        });
+        // Database query error
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
   }

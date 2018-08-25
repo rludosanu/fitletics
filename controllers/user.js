@@ -5,13 +5,8 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 
 module.exports = class User {
-	/*
-  ** Default
-  */
   constructor(app) {
 		this._app = app;
-
-    this.blacklistedTokens = [];
 	}
 
   /*****************************************************************************
@@ -33,7 +28,7 @@ module.exports = class User {
     var datas = req.body;
     var self = this;
 
-    /* Validate datas format */
+    // Validate data format
     joi.validate(datas, joi.object().keys({
     	firstName: joi.string().required(),
       lastName: joi.string().required(),
@@ -41,23 +36,19 @@ module.exports = class User {
       email: joi.string().email().required(),
       password: joi.string().min(6).required()
     }), (error, result) => {
-      /* Invalid data format */
       if (error) {
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid data format
+        return res.status(400).json(error.details[0].message);
       }
 
-      /* Encrypt password */
+      // Encrypt password
       bcrypt.hash(datas.password, 10, function(error, hash) {
-        /* Password encryption failed */
         if (error) {
-          return res.status(500).json({
-            error: 'Unable to encrypt password'
-          });
+          // Encryption failed
+          return res.status(500).json(error);
         }
 
-        /* Insert user into database */
+        // Insert user into database
         self._app.models.user.model.build({
           firstName: datas.firstName,
           lastName: datas.lastName,
@@ -67,7 +58,7 @@ module.exports = class User {
         })
         .save()
         .then(user => {
-          /* Send account confirmation link */
+          // Send confirmation link
           nodemailer.createTransport(self._app.config.mail).sendMail({
           	from: 'Fitletics Coach<fitleticscoach@gmail.com>',
           	to: datas.email,
@@ -95,17 +86,11 @@ module.exports = class User {
           	`
           });
 
-          /* OK */
-          res.status(200).json({
-            success: 'Congratulations, you are a Fitletics Coach subscriber. Check your emails to activate your account.'
-          });
+          // Send back success message
+          res.status(200).json('User account created.');
         })
-        /* Database insert failed */
-        .catch((error) => {
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
+        // Database query failed
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
   		});
     });
 	}
@@ -122,7 +107,7 @@ module.exports = class User {
   **
   ** ERROR
   **    400 : Invalid data format
-  **    401 : User not found
+  **    401 : Username not found
   **    403 : Account not active
   **    401 : Passwords do not match
   **    500 : Password decryption failed
@@ -132,76 +117,68 @@ module.exports = class User {
     var datas = req.body;
     var self = this;
 
-    /* Validate data format */
+    // Validate data format
 		joi.validate(datas, joi.object().keys({
-      username: joi.string().regex(/^[a-zA-Z0-9_]{6,20}$/).required(),
+      username: joi.string().regex(/^[a-zA-Z0-9_-]{6,20}$/).required(),
 			password: joi.string().min(6).required()
 		}), (error, result) => {
-      /* Invalid data format */
       if (error) {
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid data format
+        return res.status(400).json(error.details[0].message);
       }
 
-      /* Fetch user from database */
+      // Fetch user from database
       this._app.models.user.model.findOne({
         where: {
           username: datas.username
         }
       })
       .then(user => {
-        /* User not found */
         if (!user) {
-          return res.status(401).json({
-            error: 'User not found'
-          });
-        }
-        /* Account not active */
-        else if (!user.active) {
-          return res.status(403).json({
-            error: 'Account not active'
-          });
+          // User not found
+          return res.status(401).json('Username not found.');
+        } else if (!user.active) {
+          // Account not active
+          return res.status(403).json('Account not activated.');
         }
 
-        /* Compare password */
-        bcrypt.compare(datas.password, user.password)
-        .then(match => {
-          /* Passwords do not match */
-          if (!match) {
-            res.status(401).json({
-              error: 'Passwords do not match'
-            });
+        // Compare request and database passwords
+        bcrypt.compare(datas.password, user.password, (error, match) => {
+          if (error) {
+            // Comparison failed
+            return res.status(500).json(error);
+          } else if (!match) {
+            // Passwords don't match
+            return res.status(401).json('Invalid password.');
           }
 
-          /* Create new session token */
+          // Generate new session token
           var token = jwt.sign({ id: user.id }, self._app.config.jsonwebtoken.secret);
 
-          /* OK */
-          res.status(200).json({
-            token: token
-          });
-        })
-        /* Password decryption failed */
-        .catch(error => {
-          res.status(500).json({
-            error: 'Password decryption failed'
-          });
+          // Send back session token
+          res.status(200).json(token);
         });
       })
-      /* Database select error */
-      .catch(error => {
-        res.status(500).json({
-          error: 'Database query error'
-        });
-      });
+      // Database query failed
+      .catch(error =>  res.status(500).json(error.parent.sqlMessage));
     });
   }
 
-	/*
-  ** Read
-  **    Get user account informations using a json web token to retreive user "id".
-  */
+  /*****************************************************************************
+  ** ROUTE
+  **    POST /api/user/read
+  **
+  ** DESCRIPTION
+  **    Get user account informations.
+  **
+  ** SUCCESS
+  **    200 : User account created.
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    500 : Password encryption failed
+  **    500 : Database insert failed
+  *****************************************************************************/
 	read(req, res) {
     var datas = req.cookies;
     var self = this;
@@ -210,38 +187,29 @@ module.exports = class User {
     joi.validate(datas, joi.object().keys({
     	token: joi.string().required(),
     }), (error, result) => {
-      // Invalid data format
       if (error) {
-        console.error(error);
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid data format
+        return res.status(400).json(error.details[0].message);
       }
 
-      // Decrypt json web token
+      // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        // Token not decrypted
         if (error) {
-          console.error(error);
-          return res.status(400).json({
-            error: error
-          });
+          // Decryption failed
+          return res.status(400).json(error);
         }
 
-        // Read from database
+        // Fetch user from database
         self._app.models.user.model.findOne({
           attributes: ['firstName', 'lastName', 'username', 'email'],
           where: {
             id: decoded.id
           }
         })
+        // Send back user datas
         .then(result => res.status(200).json(result))
-        .catch(error => {
-          console.error(error);
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
+        // Database query failed
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
 		});
 	}
@@ -270,10 +238,10 @@ module.exports = class User {
     var datas = req.body;
     var self = this;
 
-    /* Add session token to datas */
+    // Add session token to datas
     datas.token = req.cookies.token;
 
-    /* Validate datas format */
+    // Validate datas format
     joi.validate(datas, joi.object().keys({
       firstName: joi.string().required(),
       lastName: joi.string().required(),
@@ -282,78 +250,55 @@ module.exports = class User {
       password: joi.string().min(6).required(),
       token: joi.string().required()
     }), (error, result) => {
-      /* Invalid datas format */
       if (error) {
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid datas format
+        return res.status(400).json(error.details[0].message);
       }
 
-      /* Session token decryption */
+      // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        /* Malformed session token */
         if (error) {
-          return res.status(400).json({
-            error: error
-          });
+          // Decryption failed
+          return res.status(400).json(error);
         }
 
-        /* Fetch user from database */
+        // Fetch user from database
         self._app.models.user.model.findOne({
           where: {
             id: decoded.id
           }
         })
-        .then((user) => {
-          /* User not found */
+        .then(user => {
           if (!user) {
-            return res.status(401).json({
-              error: 'User not found'
-            });
+            // User not found
+            return res.status(401).json('User not found');
           }
 
-          /* Compare passwords */
-          bcrypt.compare(datas.password, user.dataValues.password)
-          .then((match) => {
-            /* Passwords do not match */
-            if (!match) {
-              res.status(401).json({
-                error: 'Passwords do not match'
-              });
+          // Compare passwords
+          bcrypt.compare(datas.password, user.dataValues.password, (error, match) => {
+            if (error) {
+              // Comparison error
+              return res.status(500).json(error);
+            } else if (!match) {
+              // Passwords don't match
+              return res.status(401).json('Passwords do not match');
             }
 
-            /* Update database */
+            // Update database entry
             user.update({
               firstName: datas.firstName,
               lastName: datas.lastName,
               username: datas.username,
               email: datas.email
             })
-            .then((rows) => {
-              res.status(200).json({
-                success: 'Profile updated'
-              });
-            })
-            .catch((error) => {
-              /* Database updated failed */
-              res.status(500).json({
-                error: 'Database query error'
-              });
-            });
-          })
-          /* Password decryption failed */
-          .catch((error) => {
-            res.status(500).json({
-              error: 'Password decryption failed'
-            });
+            // Database updated
+            .then(rows => res.status(200).json('Profile updated'))
+            // Database query failed
+            .catch(error => res.status(500).json(error.parent.sqlMessage));
           });
         })
-        /* Database fetch failed */
-        .catch((error) => {
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
+        // Database query failed
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
 	}
@@ -382,94 +327,69 @@ module.exports = class User {
     var datas = req.body;
     var self = this;
 
-    /* Add session token to datas object */
+    // Add session token to datas
     datas.token = req.cookies.token;
 
-    /* Validate datas format */
+    // Validate datas format
     joi.validate(datas, joi.object().keys({
       password: joi.string().min(6).required(),
       newPassword: joi.string().min(6).required(),
       token: joi.string().required()
     }), (error, result) => {
-      /* Invalid datas format */
       if (error) {
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid datas format
+        return res.status(400).json(error.details[0].message);
       }
 
-      /* Session token decryption */
+      // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        /* Malformed session token */
         if (error) {
-          return res.status(400).json({
-            error: error
-          });
+          // Decryption failed
+          return res.status(400).json(error);
         }
 
-        /* Select user by id using decoded session token */
+        // Fetch user from database
         self._app.models.user.model.findOne({
           where: {
             id: decoded.id
           }
         })
         .then(user => {
-          /* User not found in database */
           if (!user) {
-            return res.status(401).json({
-              error: 'User not found'
-            });
+            // User not found
+            return res.status(401).json('User not found');
           }
 
-          /* Compare passwords */
-          bcrypt.compare(datas.password, user.dataValues.password)
-          .then((match) => {
-            /* Passwords do not match */
-            if (!match) {
-              res.status(401).json({
-                error: 'Passwords do not match'
-              });
+          // Compare passwords
+          bcrypt.compare(datas.password, user.dataValues.password, (error, match) => {
+            if (error) {
+              // Comparison error
+              return res.status(500).json(error);
+            } else if (!match) {
+              // Passwords don't match
+              return res.status(401).json('Passwords do not match');
             }
 
-            /* Encrypt new password */
+            // Encrypt new password
             bcrypt.hash(datas.newPassword, 10, function(error, hash) {
-              /* Password encryption failed */
               if (error) {
-                return res.status(500).json({
-                  error: 'Password encryption failed'
-                });
+                // Encryption error
+                return res.status(500).json(error);
               }
 
-              /* Update user password with encrypted hash */
+              // Update database
               user.update({
                 password: hash
               })
-              .then((rows) => {
-                res.status(200).json({
-                  success: 'Password updated'
-                });
-              })
-              .catch((error) => {
-                /* Database update failed */
-                res.status(500).json({
-                  error: 'Database query error'
-                });
-              });
-            });
-          })
-          /* Password decryption failed */
-          .catch((error) => {
-            res.status(500).json({
-              error: 'Password decryption failed'
+              // Update success
+              .then(rows => res.status(200).json('Password updated'))
+              // Database query error
+              .catch(error => res.status(500).json(error.parent.sqlMessage));
             });
           });
         })
-        /* Database select failed */
-        .catch((error) => {
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
+        // Database query error
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
   }
@@ -495,58 +415,41 @@ module.exports = class User {
     var datas = req.body;
     var self = this;
 
-    /* Validate datas format */
+    // Validate datas format
 		joi.validate(datas, joi.object().keys({
 			token: joi.string().required()
 		}), (error, result) => {
-      /* Invalid datas format */
       if (error) {
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid datas format
+        return res.status(400).json(error.details[0].message);
       }
 
-      /* Fetch user from database */
+      // Fetch user from database
       self._app.models.user.model.findOne({
         active: false,
         activationToken: datas.token
       })
       .then(user => {
-        /* Invalid activation token */
         if (!user) {
-          return res.status(401).json({
-            error: 'Invalid activation token'
-          });
+          // User not found
+          return res.status(401).json('User not found');
         } else if (user.active) {
-          return res.status(401).json({
-            error: 'Account already active'
-          });
+          // Account already active
+          return res.status(401).json('Account already active');
         }
 
-        /* Update user in database */
+        // Update database
         user.update({
           active: true,
   				activationToken: null
         })
-        .then((rows) => {
-          /* OK */
-          res.status(200).json({
-            success: 'Account activated'
-          });
-        })
-        /* Database update failed */
-        .catch((error) => {
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
+        // Database updated
+        .then(rows => res.status(200).json('Account activated'))
+        // Database query error
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
       })
-      /* Database select failed */
-      .catch((error) => {
-        res.status(500).json({
-          error: 'Database query error'
-        });
-      });
+      // Database query error
+      .catch(error => res.status(500).json(error.parent.sqlMessage));
     });
 	}
 
@@ -570,27 +473,23 @@ module.exports = class User {
     var datas = req.cookies;
     var self = this;
 
-    /* Validate datas format */
+    // Validate datas format
     joi.validate(datas, joi.object().keys({
       token: joi.string().required(),
     }), (error, result) => {
-      /* Invalid datas format */
       if (error) {
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid datas format
+        return res.status(400).json(error.details[0].message);
       }
 
-      /* Decrypt session token */
+      // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
-        /* Session token decryption failed */
         if (error) {
-          return res.status(400).json({
-            error: error
-          });
+          // Decryption failed
+          return res.status(400).json(error);
         }
 
-        /* Update database */
+        // Update database
         self._app.models.user.model.update({
           active: false
         }, {
@@ -599,24 +498,15 @@ module.exports = class User {
           }
         })
         .then(rows => {
-          /* User not found or account already deactivated */
   				if (!rows[0]) {
-            return res.status(401).json({
-              error: 'User not found or account already deactivated'
-            });
+            // User not found or account already deactivated
+            return res.status(401).json('User not found or account already deactivated');
           }
 
-          /* OK */
-          res.status(200).json({
-            success: 'Account deactivated'
-          });
+          res.status(200).json('Account deactivated');
         })
-        /* Database update failed */
-        .catch(error => {
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
+        // Database query error
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
 	}
@@ -652,27 +542,23 @@ module.exports = class User {
     };
     var newPassword = generatePassword();
 
-    /* Validate data format */
+    // Validate data format
     joi.validate(datas, joi.object().keys({
       email: joi.string().email().required(),
     }), (error, result) => {
-      /* Invalid data format */
       if (error) {
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid data format
+        return res.status(400).json(error.details[0].message);
       }
 
-      /* Encrypt new password */
+      // Encrypt new password
       bcrypt.hash(newPassword, 10, function(error, hash) {
-        /* Password encryption failed */
         if (error) {
-          return res.status(500).json({
-            error: 'Password encryption failed'
-          });
+          // Encryption error
+          return res.status(500).json(error);
         }
 
-        /* Update database */
+        // Update database
         self._app.models.user.model.update({
           password: hash
         }, {
@@ -681,11 +567,9 @@ module.exports = class User {
           }
         })
         .then(rows => {
-          /* User not found */
           if (!rows[0]) {
-            return res.status(401).json({
-              error: 'User not found'
-            });
+            // User not found
+            return res.status(401).json('User not found');
           }
 
           /* Send new password by email */
@@ -713,17 +597,10 @@ module.exports = class User {
             `
           });
 
-          /* OK */
-          res.status(200).json({
-            success: 'Password reset'
-          });
+          res.status(200).json('Password reset');
         })
-        /* Database update failed */
-        .catch(error => {
-          res.status(500).json({
-            error: 'Database query error'
-          });
-        });
+        // Database query error
+        .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
   }

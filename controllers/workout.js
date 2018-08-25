@@ -2,17 +2,25 @@ const joi = require('joi');
 const { Op } = require('sequelize');
 
 module.exports = class Workout {
-	/*
-  ** Default
-  */
   constructor(app) {
 		this._app = app;
 	}
 
-  /*
-  ** readOne
-  **    Return one workout based on its id.
-  */
+  /*****************************************************************************
+  ** ROUTE
+  **    POST /api/workout/:id
+  **
+  ** DESCRIPTION
+  **    Get one workout.
+  **
+  ** SUCCESS
+  **    200 : Workout object
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    404 : Workout not found
+  **    500 : Database query error
+  *****************************************************************************/
   readOne(req, res) {
     var self = this;
     var datas = req.params;
@@ -21,14 +29,12 @@ module.exports = class Workout {
     joi.validate(datas, joi.object().keys({
       id: joi.number().integer().required(),
     }), (error, result) => {
-      // Invalid data format
       if (error) {
-        console.error(error);
-        return res.status(400).json({
-          error: error.details[0].message
-        });
+        // Invalid data format
+        return res.status(400).json(error.details[0].message);
       }
 
+      // Fetch from database
       self._app.models.workout.model.findOne({
         where: {
           id: datas.id
@@ -47,7 +53,8 @@ module.exports = class Workout {
         var datas = {};
 
         if (!workout) {
-          return res.status(404).json({ error: 'Workout not found' });
+          // Workout not found
+          return res.status(404).json('Workout not found');
         }
 
         datas.id = workout.id;
@@ -68,19 +75,33 @@ module.exports = class Workout {
           }
         }
 
+        // Send back workout
         res.status(200).json(datas);
       })
-      .catch(error => res.status(500).json(error));
+      // Database query error
+      .catch(error => res.status(500).json(error.parent.sqlMessage));
     });
   }
 
-  /*
-  ** readAll
-  **    Returns all of the workouts.
-  */
+  /*****************************************************************************
+  ** ROUTE
+  **    POST /api/workout
+  **
+  ** DESCRIPTION
+  **    Get all workouts.
+  **
+  ** SUCCESS
+  **    200 : Array of workouts objects
+  **
+  ** ERROR
+  **    400 : Invalid data format
+  **    404 : Workout not found
+  **    500 : Database query error
+  *****************************************************************************/
   readAll(req, res) {
     var self = this;
 
+    // Fetch from database
     self._app.models.workout.model.findAll({
       attributes: ['id', 'name'],
       include: [{
@@ -119,8 +140,10 @@ module.exports = class Workout {
         }
       }
 
+      // Send back workouts
       res.status(200).json(datas);
     })
-    .catch(error => res.status(500).json(error));
+    // Database query error
+    .catch(error => res.status(500).json(error.parent.sqlMessage));
   }
 };

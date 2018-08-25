@@ -91,7 +91,7 @@
         var self = this;
 
         if (!self.datas.username) {
-          $scope.validation.trigger('Username is not allowed to be empty.');
+          $scope.validation.trigger('Username is not allowed to be empty and must contain only alphanumerical values, underscores or dashes.');
         } else if (!self.datas.password || self.datas.password.length < 6) {
           $scope.validation.trigger('Password is not allowed to be empty and less than 6 characters long.');
         } else {
@@ -115,11 +115,12 @@
           }
         })
         .then(result => {
-          $cookies.put('token', result.data.token);
+          $cookies.put('token', result.data);
           $window.location.href = '/dashboard';
         })
         .catch(error => {
-          $scope.validation.trigger(false, error.data.error);
+          console.error(error.data);
+          $scope.validation.trigger(error.data);
         });
       }
     };
@@ -152,11 +153,11 @@
     $scope.form = {
       /* Datas values */
       datas: {
-        firstName: '',
-        lastName: '',
-        username: '',
-        email: '',
-        password: ''
+        firstName: 'Razvan',
+        lastName: 'Ludosanu',
+        username: 'rludosanu',
+        email: 'r.ludosanu@gmail.com',
+        password: 'ludosanu'
       },
       /* Reset all datas values */
       reset: function() {
@@ -171,15 +172,15 @@
       validate: function() {
         var self = this;
 
-        if (!$scope.user.firstName) {
+        if (!self.datas.firstName) {
           $scope.validation.trigger(false, 'First name is not allowed to be empty.');
-        } else if (!$scope.user.lastName) {
+        } else if (!self.datas.lastName) {
           $scope.validation.trigger(false, 'Last name is not allowed to be empty.');
-        } else if (!$scope.user.username) {
+        } else if (!self.datas.username) {
           $scope.validation.trigger(false, 'Username is not allowed to be empty.');
-        } else if (!$scope.user.email) {
+        } else if (!self.datas.email) {
           $scope.validation.trigger(false, 'Email address is not allowed to be empty.');
-        } else if (!$scope.user.password || $scope.user.password.length < 6) {
+        } else if (!self.datas.password || self.datas.password.length < 6) {
           $scope.validation.trigger(false, 'Password is not allowed to be empty and less than 6 characters long.');
         } else {
           return true;
@@ -209,7 +210,7 @@
          self.reset();
        })
        .catch(error => {
-         $scope.validation.trigger(false, error.data.error);
+         $scope.validation.trigger(false, error.data);
        });
       }
     };
@@ -301,7 +302,7 @@
           }
         })
         .catch(error => {
-          popValidation(false, error.data.error, 'Database error');
+          popValidation(false, error.data, 'Database error');
         });
       },
       /* Send datas to API */
@@ -327,7 +328,7 @@
           self.datas.password = '';
         })
         .catch(error => {
-          $scope.validation.trigger(false, error.data.error);
+          $scope.validation.trigger(false, error.data);
         });
       }
     };
@@ -409,7 +410,7 @@
           self.reset();
         })
         .catch(error => {
-          $scope.validation.trigger(false, error.data.error);
+          $scope.validation.trigger(false, error.data);
         });
       }
     };
@@ -469,7 +470,7 @@
           $scope.form.datas.email = '';
         })
         .catch(error => {
-          $scope.validation.trigger(false, error.data.error);
+          $scope.validation.trigger(false, error.data);
         });
       }
     };
@@ -494,7 +495,7 @@
       $scope.countTrainings = $scope.trainings.length;
     })
     .catch(error => {
-      console.error(error.data.error);
+      console.error(error.data);
     });
   });
 

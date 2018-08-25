@@ -82,7 +82,6 @@
 			url: 'http://' + appAddr + '/api/workout/' + id
 		})
 		.then(result => {
-			console.log(result);
 			$scope.workout = result.data;
 			$scope.barchart.maxVolume = getMaxVolume();
 		})
