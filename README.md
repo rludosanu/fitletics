@@ -17,7 +17,7 @@ Fitletics is a calisthenics workout web app designed for mobiles browsers only !
 </p>
 
 ## Demo
-The current live demo is hosted at https://nodehub.freeboxos.fr:4000
+The current live demo is hosted at https://82.67.201.36:4000
 
 ## Configuration
 Before running the app, you must update the configuration file located in the **/config** directory.
