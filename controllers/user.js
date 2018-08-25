@@ -27,6 +27,7 @@ module.exports = class User {
 	signup(req, res) {
     var datas = req.body;
     var self = this;
+    var url = self._app.config.server.host + ':' + this._app.config.server.port;
 
     // Validate data format
     joi.validate(datas, joi.object().keys({
@@ -72,7 +73,7 @@ module.exports = class User {
                 Congratulations, you are a Fitletics Coach subscriber. You have decided to lead a healthier and happier life.
               </div>
               <div style="margin-bottom: 20px;">
-                Start your Fitletics experience now by activating your account. Click on the following link <a href="http://192.168.1.26:3000/activate/${user.dataValues.activationToken}">http://192.168.1.26:3000/activate/${user.dataValues.activationToken}</a>
+                Start your Fitletics experience now by activating your account. Click on the following link <a href="http://${url}/activate/${user.dataValues.activationToken}">http://${url}/activate/${user.dataValues.activationToken}</a>
               </div>
               <div style="margin-bottom: 20px;">
                 You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
@@ -541,6 +542,7 @@ module.exports = class User {
       return password;
     };
     var newPassword = generatePassword();
+    var url = self._app.config.server.host + ':' + this._app.config.server.port;
 
     // Validate data format
     joi.validate(datas, joi.object().keys({
@@ -583,7 +585,7 @@ module.exports = class User {
                 Hi !
               </div>
               <div style="margin-bottom: 20px;">
-                You requested to reset your password. Your new password is <strong>${newPassword}</strong>. You can sign in by clicking the folling link <a href="http://192.168.1.26:3000/signin">http://192.168.1.26:3000/signin</a>.
+                You requested to reset your password. Your new password is <strong>${newPassword}</strong>. You can sign in by clicking the folling link <a href="http://${url}/signin">http://${url}/signin</a>.
               </div>
               <div style="margin-bottom: 20px;">
                 You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.

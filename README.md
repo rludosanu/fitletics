@@ -17,10 +17,10 @@ Fitletics is a calisthenics workout web app designed for mobiles browsers only !
 </p>
 
 ## Demo
-The current live demo is hosted at https://82.67.201.36:4000
+The current live demo is hosted at http://82.67.201.36:4000
 
 ## Configuration
-Before running the app, you must update the configuration file located in the **/config** directory.
+Before running the app, you must update/create the configuration file located at **/config/index.js** like so.
 
 ```
 const Sequelize = require('sequelize');
@@ -28,34 +28,35 @@ const Sequelize = require('sequelize');
 module.exports = {
   // Running ip and port
   server: {
-    host: '127.0.0.1',
-    port: 4000
+    host: '',
+    port: 0000
   },
   // Database connection options
   database: {
-    host: '127.0.0.1',
-    port: 3306,
-    dialect: 'mysql',
+    host: '',
+    port: 0000,
+    dialect: '',
     operatorsAliases: Sequelize.Op,
-    database: 'database',
-    username: 'username',
-    password: 'password'
+    database: '',
+    username: '',
+    password: ''
   },
   // Reset database tables on server startup
+  // Must be set to true for the first run to initialize database
   models: {
     sync: false
   },
   // Nodemailer options
   mail: {
-    service: 'provider',
+    service: '',
     auth: {
-      user: 'user@domain.ext',
-      pass: 'password'
+      user: '',
+      pass: ''
     }
   },
   // Json Web Token secret encryption key
   jsonwebtoken: {
-    secret: 'aVerySecretEncryptionKey'
+    secret: ''
   }
 };
 
@@ -69,17 +70,17 @@ module.exports = {
 Create the virtual host.
 
 ```
-$> docker-machine create --driver virtualbox fitletics
+$> docker-machine create --driver virtualbox my-docker-machine
 
-$> docker-machine start fitletics
+$> docker-machine start my-docker-machine
 
-$> eval $(docker-machine env fitletics)
+$> eval $(docker-machine env my-docker-machine)
 ```
 
 Build the server container.
 
 ```
-$> docker build -t fitletics .
+$> docker build -t fitletics-server .
 ```
 
 Run the MySQL or the PostgreSQL database. Note that the version of MySQL must be <= 5.6 otherwise Sequelize will fail on authentication.
@@ -95,7 +96,7 @@ $> docker run -d -p 5432:5432 -e "POSTGRES_PASSWORD=__password__" -e "POSTGRES_U
 Run the server.
 
 ```
-$> docker run -d -p 4000:4000 fitletics
+$> docker run -d -p 4000:4000 fitletics-server
 ```
 
 Enjoy !
@@ -115,7 +116,7 @@ FROM resin/raspberry-pi-alpine-node
 Build the server containers.
 
 ```
-$> docker build -t fitletics .
+$> docker build -t fitletics-server .
 ```
 
 Run the PostgreSQL database.
@@ -127,7 +128,7 @@ $> docker run -d -p 5432:5432 -e "POSTGRES_PASSWORD=__password__" -e "POSTGRES_U
 Run the server.
 
 ```
-$> docker run -d -p 4000:4000 fitletics
+$> docker run -d -p 4000:4000 fitletics-server
 ```
 
 Enjoy !

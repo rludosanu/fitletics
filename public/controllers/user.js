@@ -302,7 +302,7 @@
           }
         })
         .catch(error => {
-          popValidation(false, error.data, 'Database error');
+          $scope.validation.trigger(false, error.data);
         });
       },
       /* Send datas to API */
