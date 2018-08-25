@@ -13,7 +13,6 @@ class Database {
 		  force: self._app.config.models.sync
 		})
 		.then(() => {
-			console.log('Connected to database');
 			if (self._app.config.models.sync) {
 				self.init();
 			}

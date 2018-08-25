@@ -167,7 +167,7 @@
 						url: 'http://' + appAddr + '/api/training/create',
 						data: {
 							exerciseId: parseInt(exerciseId),
-							volume: parseInt(volume)
+							volume: parseInt(exerciseVolume)
 						}
 					})
 					.then(result => {
@@ -181,7 +181,7 @@
 		/* Get exercise informations */
 		$http({
 			method: 'POST',
-			url: 'http://' + appAddr + '/api/exercise/' + id
+			url: 'http://' + appAddr + '/api/exercise/' + exerciseId
 		})
 		.then(result => {
 			$scope.exercise.name = result.data.name;

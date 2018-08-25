@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const mustacheExpress = require('mustache-express');
 const path = require('path');
+const accessLogStream = fs.createWriteStream(__dirname + '/logs/access.log', {flags: 'a'});
 
 const Config = require('./config/index');
 const Database = require('./database/index');
@@ -26,7 +27,7 @@ class Server {
 		this.app = express();
 
 		/* App log */
-		this.app.use(morgan('dev'));
+		this.app.use(morgan('common', {stream: accessLogStream}));
 
 		/* HTTP request parser */
 		this.app.use(bodyParser.json());

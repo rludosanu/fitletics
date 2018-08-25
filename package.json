@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "forever -l logs/forever.log -o logs/stdout.log -e logs/stderr.log server.js"
   },
   "author": "Razvan Ludosanu",
   "license": "ISC",
@@ -18,6 +18,7 @@
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
+    "forever": "^0.15.3",
     "joi": "^13.5.2",
     "jsonwebtoken": "^8.3.0",
     "mustache-express": "^1.2.7",
