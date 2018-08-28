@@ -153,11 +153,11 @@
     $scope.form = {
       /* Datas values */
       datas: {
-        firstName: 'Razvan',
-        lastName: 'Ludosanu',
-        username: 'rludosanu',
-        email: 'r.ludosanu@gmail.com',
-        password: 'ludosanu'
+        firstName: '',
+        lastName: '',
+        username: '',
+        email: '',
+        password: ''
       },
       /* Reset all datas values */
       reset: function() {
@@ -521,12 +521,14 @@
       }
     })
     .then(result => {
+      console.log(result);
       $scope.validation = {
         success: true,
         error: false
       };
     })
     .catch(error => {
+      console.error(error);
       $scope.validation = {
         success: false,
         error: true

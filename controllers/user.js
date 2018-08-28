@@ -14,22 +14,23 @@ module.exports = class User {
   **    POST /api/user/signup
   **
   ** DESCRIPTION
-  **    Create a new user account and send an activation link.
+  **    Create a new user account and send an link containing the activation
+  **    token.
   **
   ** SUCCESS
-  **    200 : User account created.
+  **    200 OK: Activation token
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    500 : Password encryption failed
-  **    500 : Database insert failed
+  **    400 Bad Request: Invalid datas
+  **    500 Internal Server Error: Password encryption failed
+  **    500 Internal Server Error: Database query failed
   *****************************************************************************/
 	signup(req, res) {
     var datas = req.body;
     var self = this;
     var url = self._app.config.server.host + ':' + this._app.config.server.port;
 
-    // Validate data format
+    // Validate datas
     joi.validate(datas, joi.object().keys({
     	firstName: joi.string().required(),
       lastName: joi.string().required(),
@@ -38,15 +39,15 @@ module.exports = class User {
       password: joi.string().min(6).required()
     }), (error, result) => {
       if (error) {
-        // Invalid data format
-        return res.status(400).json(error.details[0].message);
+        // 400 Bad Request: Invalid datas
+        return res.status(400).json('Invalid datas');
       }
 
       // Encrypt password
       bcrypt.hash(datas.password, 10, function(error, hash) {
         if (error) {
-          // Encryption failed
-          return res.status(500).json(error);
+          // 500 Internal Server Error: Password encryption failed
+          return res.status(500).json('Password encryption failed');
         }
 
         // Insert user into database
@@ -61,7 +62,7 @@ module.exports = class User {
         .then(user => {
           // Send confirmation link
           nodemailer.createTransport(self._app.config.mail).sendMail({
-          	from: 'Fitletics Coach<fitleticscoach@gmail.com>',
+          	from: `Fitletics Coach<${self._app.config.mail.auth.user}>`,
           	to: datas.email,
           	subject: 'Welcome to Fitletics Coach',
           	html: `
@@ -76,7 +77,7 @@ module.exports = class User {
                 Start your Fitletics experience now by activating your account. Click on the following link <a href="http://${url}/activate/${user.dataValues.activationToken}">http://${url}/activate/${user.dataValues.activationToken}</a>
               </div>
               <div style="margin-bottom: 20px;">
-                You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
+                You have any questions or comments ? Sends us an email at ${self._app.config.mail.auth.user}. A member of our team will take care of you as soon as possible.
               </div>
           		<div>
                 Enjoy your account,
@@ -87,10 +88,10 @@ module.exports = class User {
           	`
           });
 
-          // Send back success message
-          res.status(200).json('User account created.');
+          // 200 OK: Activation token
+          res.status(200).json(user.dataValues.activationToken);
         })
-        // Database query failed
+        // 500 Internal Server Error: Database query failed
         .catch(error => res.status(500).json(error.parent.sqlMessage));
   		});
     });
@@ -104,31 +105,31 @@ module.exports = class User {
   **    Checks the couple username:password and returns a new session token.
   **
   ** SUCCESS
-  **    200 : User account created.
+  **    200 OK: Session token (jwt)
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    401 : Username not found
-  **    403 : Account not active
-  **    401 : Passwords do not match
-  **    500 : Password decryption failed
-  **    500 : Database select failed
+  **    400 Bad Request: Invalid datas
+  **    403 Forbidden: User not active
+  **    403 Forbidden: Invalid password
+  **    404 Not Found: Username not found
+  **    500 Internal Server Error: Password decryption failed
+  **    500 Internal Server Error: Database query failed
   *****************************************************************************/
   signin(req, res) {
     var datas = req.body;
     var self = this;
 
-    // Validate data format
+    // Validate datas
 		joi.validate(datas, joi.object().keys({
       username: joi.string().regex(/^[a-zA-Z0-9_-]{6,20}$/).required(),
 			password: joi.string().min(6).required()
 		}), (error, result) => {
       if (error) {
-        // Invalid data format
-        return res.status(400).json(error.details[0].message);
+        // 400 Bad Request: Invalid datas
+        return res.status(400).json('Invalid datas');
       }
 
-      // Fetch user from database
+      // Find user
       this._app.models.user.model.findOne({
         where: {
           username: datas.username
@@ -136,31 +137,31 @@ module.exports = class User {
       })
       .then(user => {
         if (!user) {
-          // User not found
-          return res.status(401).json('Username not found.');
+          // 404 Not Found: Username not found
+          return res.status(401).json('User not found');
         } else if (!user.active) {
-          // Account not active
-          return res.status(403).json('Account not activated.');
+          // 403 Forbidden: User not active
+          return res.status(403).json('User not active');
         }
 
-        // Compare request and database passwords
+        // Compare passwords
         bcrypt.compare(datas.password, user.password, (error, match) => {
           if (error) {
-            // Comparison failed
-            return res.status(500).json(error);
+            // 500 Internal Server Error: Password decryption failed
+            return res.status(500).json('Password decryption failed');
           } else if (!match) {
-            // Passwords don't match
-            return res.status(401).json('Invalid password.');
+            // 403 Forbidden: Invalid password
+            return res.status(403).json('Invalid password');
           }
 
-          // Generate new session token
+          // New JWT
           var token = jwt.sign({ id: user.id }, self._app.config.jsonwebtoken.secret);
 
-          // Send back session token
+          // 200 OK: Session token (jwt)
           res.status(200).json(token);
         });
       })
-      // Database query failed
+      // 500 Internal Server Error: Database query failed
       .catch(error =>  res.status(500).json(error.parent.sqlMessage));
     });
   }
@@ -173,43 +174,43 @@ module.exports = class User {
   **    Get user account informations.
   **
   ** SUCCESS
-  **    200 : User account created.
+  **    200 OK: User object
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    500 : Password encryption failed
-  **    500 : Database insert failed
+  **    400 Bad Request: Invalid data format
+  **    500 Internal Server Error: Session token decryption failed
+  **    500 Internal Server Error: Database query failed
   *****************************************************************************/
 	read(req, res) {
     var datas = req.cookies;
     var self = this;
 
-    // Validate data format
+    // Validate datas
     joi.validate(datas, joi.object().keys({
     	token: joi.string().required(),
     }), (error, result) => {
       if (error) {
-        // Invalid data format
+        // 400 Bad Request: Invalid datas
         return res.status(400).json(error.details[0].message);
       }
 
-      // Decrypt session token
+      // Decrypt JWT
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
         if (error) {
-          // Decryption failed
-          return res.status(400).json(error);
+          // 500 Internal Server Error: Session token decryption failed
+          return res.status(500).json('Session token decryption failed');
         }
 
-        // Fetch user from database
+        // Find user
         self._app.models.user.model.findOne({
           attributes: ['firstName', 'lastName', 'username', 'email'],
           where: {
             id: decoded.id
           }
         })
-        // Send back user datas
+        // 200 OK: User object
         .then(result => res.status(200).json(result))
-        // Database query failed
+        // 500 Internal Server Error: Database query failed
         .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
 		});
@@ -223,17 +224,17 @@ module.exports = class User {
   **    Updates the user's profile informations.
   **
   ** SUCCESS
-  **    200 : Profile updated
+  **    200 OK: Success
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    400 : Malformed token
-  **    401 : User not found
-  **    401 : Passwords do not match
-  **    500 : Password encryption failed
-  **    500 : Database select failed
-  **    500 : Password decryption failed
-  **    500 : Database update failed
+  **    304 Not Modified: User not modified
+  **    400 Bad Request: Invalid datas
+  **    400 Bad Request: Malformed token
+  **    403 Forbidden: Invalid password
+  **    404 Not Found: User not found
+  **    500 Internal Server Error: Session token decryption failed
+  **    500 Internal Server Error : Password decryption failed
+  **    500 Internal Server Error : Database query failed
   *****************************************************************************/
 	updateProfile(req, res) {
     var datas = req.body;
@@ -242,7 +243,7 @@ module.exports = class User {
     // Add session token to datas
     datas.token = req.cookies.token;
 
-    // Validate datas format
+    // Validate datas
     joi.validate(datas, joi.object().keys({
       firstName: joi.string().required(),
       lastName: joi.string().required(),
@@ -252,18 +253,18 @@ module.exports = class User {
       token: joi.string().required()
     }), (error, result) => {
       if (error) {
-        // Invalid datas format
-        return res.status(400).json(error.details[0].message);
+        // 400 Bad Request: Invalid datas
+        return res.status(400).json('Invalid datas');
       }
 
-      // Decrypt session token
+      // Decrypt JWT
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
         if (error) {
-          // Decryption failed
-          return res.status(400).json(error);
+          // 500 Internal Server Error : Session token decryption failed
+          return res.status(500).json('Session token decryption failed');
         }
 
-        // Fetch user from database
+        // Find user
         self._app.models.user.model.findOne({
           where: {
             id: decoded.id
@@ -271,18 +272,18 @@ module.exports = class User {
         })
         .then(user => {
           if (!user) {
-            // User not found
-            return res.status(401).json('User not found');
+            // 404 Not Found: User not found
+            return res.status(404).json('User not found');
           }
 
           // Compare passwords
           bcrypt.compare(datas.password, user.dataValues.password, (error, match) => {
             if (error) {
-              // Comparison error
-              return res.status(500).json(error);
+              // 500 Internal Server Error : Password decryption failed
+              return res.status(500).json('Password decryption failed');
             } else if (!match) {
-              // Passwords don't match
-              return res.status(401).json('Passwords do not match');
+              // 403 Forbidden: Invalid password
+              return res.status(403).json('Invalid password');
             }
 
             // Update database entry
@@ -292,14 +293,21 @@ module.exports = class User {
               username: datas.username,
               email: datas.email
             })
-            // Database updated
-            .then(rows => res.status(200).json('Profile updated'))
-            // Database query failed
-            .catch(error => res.status(500).json(error.parent.sqlMessage));
+            .then(user => {
+              if (!Object.keys(user._changed).length) {
+                // 304 Not Modified: User not modified
+                return res.status(304);
+              }
+
+              // 200 OK: Success
+              res.status(200).json('Profile updated');
+            })
+            // 500 Internal Server Error : Database query failed
+            .catch(error => res.status(500).json(error));
           });
         })
-        // Database query failed
-        .catch(error => res.status(500).json(error.parent.sqlMessage));
+        // 500 Internal Server Error : Database query failed
+        .catch(error => res.status(500).json(error));
       });
     });
 	}
@@ -312,17 +320,18 @@ module.exports = class User {
   **    Updates the user's "password" column in database with $newPassword.
   **
   ** SUCCESS
-  **    200 : The $newPassword has been saved
+  **    200 OK: Success
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    400 : Malformed token
-  **    401 : User not found
-  **    401 : Passwords do not match
-  **    500 : Password encryption failed
-  **    500 : Database select failed
-  **    500 : Database update failed
-  **    500 : Password decryption failed
+  **    304 Not Modified: Password not updated
+  **    400 Bad Request: Invalid data format
+  **    400 Bad Request: Malformed token
+  **    403 Forbidden: Invalid password
+  **    404 Not Found: User not found
+  **    500 Internal Server Error : Session token decryption failed
+  **    500 Internal Server Error: Password encryption failed
+  **    500 Internal Server Error : Password decryption failed
+  **    500 Internal Server Error : Database query failed
   *****************************************************************************/
   updatePassword(req, res) {
     var datas = req.body;
@@ -338,15 +347,15 @@ module.exports = class User {
       token: joi.string().required()
     }), (error, result) => {
       if (error) {
-        // Invalid datas format
+        // 400 Bad Request: Invalid data format
         return res.status(400).json(error.details[0].message);
       }
 
       // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
         if (error) {
-          // Decryption failed
-          return res.status(400).json(error);
+          // 500 Internal Server Error : Session token decryption failed
+          return res.status(400).json('Session token decryption failed');
         }
 
         // Fetch user from database
@@ -357,39 +366,46 @@ module.exports = class User {
         })
         .then(user => {
           if (!user) {
-            // User not found
-            return res.status(401).json('User not found');
+            // 404 Not Found: User not found
+            return res.status(404).json('User not found');
           }
 
           // Compare passwords
           bcrypt.compare(datas.password, user.dataValues.password, (error, match) => {
             if (error) {
-              // Comparison error
-              return res.status(500).json(error);
+              // 500 Internal Server Error : Password decryption failed
+              return res.status(500).json('Password decryption failed');
             } else if (!match) {
-              // Passwords don't match
-              return res.status(401).json('Passwords do not match');
+              // 403 Forbidden: Invalid password
+              return res.status(403).json('Invalid password');
             }
 
             // Encrypt new password
             bcrypt.hash(datas.newPassword, 10, function(error, hash) {
               if (error) {
-                // Encryption error
-                return res.status(500).json(error);
+                // 500 Internal Server Error: Password encryption failed
+                return res.status(500).json('Password encryption failed');
               }
 
               // Update database
               user.update({
                 password: hash
               })
-              // Update success
-              .then(rows => res.status(200).json('Password updated'))
-              // Database query error
+              .then(user => {
+                if (!Object.keys(user._changed).length) {
+                  // 304 Not Modified: User not modified
+                  return res.status(304);
+                }
+
+                // 200 OK: Success
+                res.status(200).json('Password updated');
+              })
+              // 500 Internal Server Error : Database query failed
               .catch(error => res.status(500).json(error.parent.sqlMessage));
             });
           });
         })
-        // Database query error
+        // 500 Internal Server Error : Database query failed
         .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
@@ -403,54 +419,85 @@ module.exports = class User {
   **    Activate user account.
   **
   ** SUCCESS
-  **    200 : User account activated.
+  **    200 OK: Success
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    401 : Invalid activation token
-  **    401 : Account already active
-  **    500 : Database select failed
-  **    500 : Database update failed
+  **    304 Not Modified: Account already active
+  **    400 Bad Request: Invalid data format
+  **    404 Not Found: User not found or account already active
+  **    500 Internal Server Error: Database query failed
   *****************************************************************************/
 	activate(req, res) {
     var datas = req.body;
     var self = this;
 
-    // Validate datas format
+    // Validate datas
 		joi.validate(datas, joi.object().keys({
 			token: joi.string().required()
 		}), (error, result) => {
       if (error) {
-        // Invalid datas format
-        return res.status(400).json(error.details[0].message);
+        // 400 Bad Request: Invalid datas
+        return res.status(400).json('Invalid datas');
       }
 
-      // Fetch user from database
+      // Find user
       self._app.models.user.model.findOne({
-        active: false,
-        activationToken: datas.token
+        where: {
+          active: false,
+          activationToken: datas.token
+        }
       })
       .then(user => {
         if (!user) {
-          // User not found
-          return res.status(401).json('User not found');
-        } else if (user.active) {
-          // Account already active
-          return res.status(401).json('Account already active');
+          // 404 Not Found: User not found or account already active
+          return res.status(404).json('User not found or account already active');
         }
 
-        // Update database
+        // Update user
         user.update({
           active: true,
   				activationToken: null
         })
         // Database updated
-        .then(rows => res.status(200).json('Account activated'))
-        // Database query error
-        .catch(error => res.status(500).json(error.parent.sqlMessage));
+        .then(user => {
+          if (!Object.keys(user._changed).length) {
+            // 304 Not Modified
+            return res.status(304);
+          }
+
+          // Send activation confirmation by email
+          nodemailer.createTransport(self._app.config.mail).sendMail({
+            from: `Fitletics Coach<${self._app.config.mail.auth.user}>`,
+            to: user.datasValues.email,
+            subject: 'Your account is now active',
+            html: `
+            <div style="color: #444444; font-size: 15px; margin: 45px 0px; width: 500px;">
+              <div style="font-size: 22px; margin-bottom: 25px;">
+                Hi ${user.datasValues.firstName}!
+              </div>
+              <div style="margin-bottom: 20px;">
+                You just activated your new Fitletics account ! You can sign in by clicking the folling link <a href="http://${url}/signin">http://${url}/signin</a>.
+              </div>
+              <div style="margin-bottom: 20px;">
+                You have any questions or comments ? Sends us an email at ${self._app.config.mail.auth.user}. A member of our team will take care of you as soon as possible.
+              </div>
+              <div>
+                Enjoy your account,
+                <br />
+                <strong>Fitletics Team</strong>
+              </div>
+            </div>
+            `
+          });
+
+          // 200 OK: Success
+          res.status(200).json('User activated');
+        })
+        // 500 Internal Server Error: Database query failed
+        .catch(error => res.status(500).json(error));
       })
-      // Database query error
-      .catch(error => res.status(500).json(error.parent.sqlMessage));
+      // 500 Internal Server Error: Database query failed
+      .catch(error => res.status(500).json(error));
     });
 	}
 
@@ -462,13 +509,14 @@ module.exports = class User {
   **    Deactivate account without deleting records.
   **
   ** SUCCESS
-  **    200 : Account deactivated.
+  **    200 OK: Success
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    400 : Session token decryption failed
-  **    401 : User not found or account already deactivated
-  **    500 : Database update failed
+  **    304 Not Modified: User not deactivated
+  **    400 Bad Request: Invalid datas
+  **    404 Not Found: User not found
+  **    500 Internal Server Error : Session token decryption failed
+  **    500 Internal Server Error : Database query failed
   *****************************************************************************/
 	deactivate(req, res) {
     var datas = req.cookies;
@@ -479,34 +527,46 @@ module.exports = class User {
       token: joi.string().required(),
     }), (error, result) => {
       if (error) {
-        // Invalid datas format
+        // 400 Bad Request: Invalid datas
         return res.status(400).json(error.details[0].message);
       }
 
       // Decrypt session token
       jwt.verify(datas.token, self._app.config.jsonwebtoken.secret, (error, decoded) => {
         if (error) {
-          // Decryption failed
+          // 500 Internal Server Error : Session token decryption failed
           return res.status(400).json(error);
         }
 
-        // Update database
-        self._app.models.user.model.update({
-          active: false
-        }, {
+        // Find user
+        self._app.models.user.model.findOne({
           where: {
             id: decoded.id
           }
         })
-        .then(rows => {
-  				if (!rows[0]) {
-            // User not found or account already deactivated
-            return res.status(401).json('User not found or account already deactivated');
+        .then(user => {
+          if (!user) {
+            // 404 Not Found: User not found
+            res.status(404).json('User not found');
           }
 
-          res.status(200).json('Account deactivated');
+          // Update user
+          user.update({
+            active: false
+          })
+          .then(user => {
+            if (!Object.keys(user._changed).length) {
+              // 304 Not Modified
+              return res.status(304);
+            }
+
+            // 200 OK: Success
+            res.status(200).json('Account deactivated');
+          })
+          // 500 Internal Server Error : Database query failed
+          .catch(error => res.status(500).json(error.parent.sqlMessage));
         })
-        // Database query error
+        // 500 Internal Server Error : Database query failed
         .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
@@ -523,10 +583,11 @@ module.exports = class User {
   **    200 : Password reset.
   **
   ** ERROR
-  **    400 : Invalid data format
-  **    500 : Password encryption failed
-  **    401 : User not found
-  **    500 : Database update failed
+  **    304 Not Modified: Password not modified
+  **    400 Bad Request: Invalid datas
+  **    404 Not Found: User not found
+  **    500 Internal Server Error : Password encryption failed
+  **    500 Internal Server Error : Database query failed
   *****************************************************************************/
   resetPassword(req, res) {
     var datas = req.body;
@@ -549,59 +610,71 @@ module.exports = class User {
       email: joi.string().email().required(),
     }), (error, result) => {
       if (error) {
-        // Invalid data format
-        return res.status(400).json(error.details[0].message);
+        // 400 Bad Request: Invalid datas
+        return res.status(400).json('Invalid datas');
       }
 
       // Encrypt new password
       bcrypt.hash(newPassword, 10, function(error, hash) {
         if (error) {
-          // Encryption error
+          // 500 Internal Server Error : Password encryption failed
           return res.status(500).json(error);
         }
 
-        // Update database
-        self._app.models.user.model.update({
-          password: hash
-        }, {
+        // Find user
+        self._app.models.user.model.findOne({
           where: {
             email: datas.email
           }
         })
-        .then(rows => {
-          if (!rows[0]) {
-            // User not found
-            return res.status(401).json('User not found');
+        .then(user => {
+          if (!user) {
+            // 404 Not Found: User not found
+            return res.status(404).json('User not found');
           }
 
-          /* Send new password by email */
-          nodemailer.createTransport(self._app.config.mail).sendMail({
-            from: 'Fitletics Coach<fitleticscoach@gmail.com>',
-            to: datas.email,
-            subject: 'Your password has been reset',
-            html: `
-            <div style="color: #444444; font-size: 15px; margin: 45px 0px; width: 500px;">
-              <div style="font-size: 22px; margin-bottom: 25px;">
-                Hi !
-              </div>
-              <div style="margin-bottom: 20px;">
-                You requested to reset your password. Your new password is <strong>${newPassword}</strong>. You can sign in by clicking the folling link <a href="http://${url}/signin">http://${url}/signin</a>.
-              </div>
-              <div style="margin-bottom: 20px;">
-                You have any questions or comments ? Sends us an email at fitleticscoach@gmail.com. A member of our team will take care of you as soon as possible.
-              </div>
-              <div>
-                Enjoy your account,
-                <br />
-                <strong>Fitletics Team</strong>
-              </div>
-            </div>
-            `
-          });
+          // Update user
+          user.update({
+            password: hash
+          })
+          .then(user => {
+            if (!Object.keys(user._changed).length) {
+              // 304 Not Modified
+              return res.status(304);
+            }
 
-          res.status(200).json('Password reset');
+            // Send password by email
+            nodemailer.createTransport(self._app.config.mail).sendMail({
+              from: `Fitletics Coach<${self._app.config.mail.auth.user}>`,
+              to: datas.email,
+              subject: 'Your password has been reset',
+              html: `
+              <div style="color: #444444; font-size: 15px; margin: 45px 0px; width: 500px;">
+                <div style="font-size: 22px; margin-bottom: 25px;">
+                  Hi ${user.datasValues.firstName}!
+                </div>
+                <div style="margin-bottom: 20px;">
+                  You requested to reset your password. Your new password is <strong>${newPassword}</strong>. You can sign in by clicking the folling link <a href="http://${url}/signin">http://${url}/signin</a>.
+                </div>
+                <div style="margin-bottom: 20px;">
+                  You have any questions or comments ? Sends us an email at ${self._app.config.mail.auth.user}. A member of our team will take care of you as soon as possible.
+                </div>
+                <div>
+                  Enjoy your account,
+                  <br />
+                  <strong>Fitletics Team</strong>
+                </div>
+              </div>
+              `
+            });
+
+            // 200 OK: Success
+            return res.status(200).json('Password modified');
+          })
+          // 500 Internal Server Error : Database query failed
+          .catch(error => res.status(500).json(error.parent.sqlMessage));
         })
-        // Database query error
+        // 500 Internal Server Error : Database query failed
         .catch(error => res.status(500).json(error.parent.sqlMessage));
       });
     });
