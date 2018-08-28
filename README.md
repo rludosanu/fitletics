@@ -62,6 +62,13 @@ module.exports = {
 
 ```
 
+## Unit tests
+
+API unit tests are built using Mocha, Chai and Chai-http. To run all tests at once run the following command in your terminal.
+
+```
+npm test
+```
 
 ## Setup
 
