@@ -138,7 +138,7 @@ module.exports = class User {
       .then(user => {
         if (!user) {
           // 404 Not Found: Username not found
-          return res.status(401).json('User not found');
+          return res.status(404).json('User not found');
         } else if (!user.active) {
           // 403 Forbidden: User not active
           return res.status(403).json('User not active');
@@ -430,6 +430,7 @@ module.exports = class User {
 	activate(req, res) {
     var datas = req.body;
     var self = this;
+    var url = self._app.config.server.host + ':' + this._app.config.server.port;
 
     // Validate datas
 		joi.validate(datas, joi.object().keys({
@@ -437,6 +438,7 @@ module.exports = class User {
 		}), (error, result) => {
       if (error) {
         // 400 Bad Request: Invalid datas
+        console.log(error);
         return res.status(400).json('Invalid datas');
       }
 
@@ -468,15 +470,15 @@ module.exports = class User {
           // Send activation confirmation by email
           nodemailer.createTransport(self._app.config.mail).sendMail({
             from: `Fitletics Coach<${self._app.config.mail.auth.user}>`,
-            to: user.datasValues.email,
-            subject: 'Your account is now active',
+            to: user.dataValues.email,
+            subject: 'Your Fitletics Coach account is now active',
             html: `
             <div style="color: #444444; font-size: 15px; margin: 45px 0px; width: 500px;">
               <div style="font-size: 22px; margin-bottom: 25px;">
-                Hi ${user.datasValues.firstName}!
+                Hi ${user.dataValues.firstName}!
               </div>
               <div style="margin-bottom: 20px;">
-                You just activated your new Fitletics account ! You can sign in by clicking the folling link <a href="http://${url}/signin">http://${url}/signin</a>.
+                You just activated your new Fitletics Coach account ! You can sign in and start training by clicking the folling link <a href="http://${url}/signin">http://${url}/signin</a>
               </div>
               <div style="margin-bottom: 20px;">
                 You have any questions or comments ? Sends us an email at ${self._app.config.mail.auth.user}. A member of our team will take care of you as soon as possible.
@@ -494,10 +496,16 @@ module.exports = class User {
           res.status(200).json('User activated');
         })
         // 500 Internal Server Error: Database query failed
-        .catch(error => res.status(500).json(error));
+        .catch(error => {
+          console.log(error);
+          res.status(500).json(error);
+        });
       })
       // 500 Internal Server Error: Database query failed
-      .catch(error => res.status(500).json(error));
+      .catch(error => {
+        console.log(error);
+        res.status(500).json(error);
+      });
     });
 	}
 
@@ -651,7 +659,7 @@ module.exports = class User {
               html: `
               <div style="color: #444444; font-size: 15px; margin: 45px 0px; width: 500px;">
                 <div style="font-size: 22px; margin-bottom: 25px;">
-                  Hi ${user.datasValues.firstName}!
+                  Hi ${user.dataValues.firstName}!
                 </div>
                 <div style="margin-bottom: 20px;">
                   You requested to reset your password. Your new password is <strong>${newPassword}</strong>. You can sign in by clicking the folling link <a href="http://${url}/signin">http://${url}/signin</a>.
