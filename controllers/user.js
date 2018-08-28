@@ -178,6 +178,7 @@ module.exports = class User {
   **
   ** ERROR
   **    400 Bad Request: Invalid data format
+  **    404 Not Found: User not found
   **    500 Internal Server Error: Session token decryption failed
   **    500 Internal Server Error: Database query failed
   *****************************************************************************/
@@ -187,7 +188,7 @@ module.exports = class User {
 
     // Validate datas
     joi.validate(datas, joi.object().keys({
-    	token: joi.string().required(),
+    	token: joi.string().min(10).required(),
     }), (error, result) => {
       if (error) {
         // 400 Bad Request: Invalid datas
@@ -208,10 +209,18 @@ module.exports = class User {
             id: decoded.id
           }
         })
-        // 200 OK: User object
-        .then(result => res.status(200).json(result))
+        .then(user => {
+          if (!user) {
+            // 404 Not Found: User not found
+            return res.status(404).json('User not found');
+          }
+          // 200 OK: User object
+          res.status(200).json(user);
+        })
         // 500 Internal Server Error: Database query failed
-        .catch(error => res.status(500).json(error.parent.sqlMessage));
+        .catch(error => {
+          res.status(500).json(error.parent.sqlMessage);
+        });
       });
 		});
 	}
@@ -296,18 +305,22 @@ module.exports = class User {
             .then(user => {
               if (!Object.keys(user._changed).length) {
                 // 304 Not Modified: User not modified
-                return res.status(304);
+                return res.status(304).json();
               }
 
               // 200 OK: Success
               res.status(200).json('Profile updated');
             })
             // 500 Internal Server Error : Database query failed
-            .catch(error => res.status(500).json(error));
+            .catch(error => {
+              res.status(500).json(error);
+            });
           });
         })
         // 500 Internal Server Error : Database query failed
-        .catch(error => res.status(500).json(error));
+        .catch(error => {
+          res.status(500).json(error);
+        });
       });
     });
 	}
@@ -394,7 +407,7 @@ module.exports = class User {
               .then(user => {
                 if (!Object.keys(user._changed).length) {
                   // 304 Not Modified: User not modified
-                  return res.status(304);
+                  return res.status(304).json();
                 }
 
                 // 200 OK: Success
@@ -438,7 +451,6 @@ module.exports = class User {
 		}), (error, result) => {
       if (error) {
         // 400 Bad Request: Invalid datas
-        console.log(error);
         return res.status(400).json('Invalid datas');
       }
 
@@ -464,7 +476,7 @@ module.exports = class User {
         .then(user => {
           if (!Object.keys(user._changed).length) {
             // 304 Not Modified
-            return res.status(304);
+            return res.status(304).json();
           }
 
           // Send activation confirmation by email
@@ -497,13 +509,11 @@ module.exports = class User {
         })
         // 500 Internal Server Error: Database query failed
         .catch(error => {
-          console.log(error);
           res.status(500).json(error);
         });
       })
       // 500 Internal Server Error: Database query failed
       .catch(error => {
-        console.log(error);
         res.status(500).json(error);
       });
     });
@@ -565,7 +575,7 @@ module.exports = class User {
           .then(user => {
             if (!Object.keys(user._changed).length) {
               // 304 Not Modified
-              return res.status(304);
+              return res.status(304).json();
             }
 
             // 200 OK: Success
@@ -648,7 +658,7 @@ module.exports = class User {
           .then(user => {
             if (!Object.keys(user._changed).length) {
               // 304 Not Modified
-              return res.status(304);
+              return res.status(304).json();
             }
 
             // Send password by email
