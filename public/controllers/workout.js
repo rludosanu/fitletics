@@ -99,13 +99,31 @@
 		var url = $location.absUrl().split('/');
 		var id = url[url.length - 2];
 		var workout = null;
+		var trainingId = null;
 
+		// Find workout
 		$http({
 			method: 'POST',
 			url: 'http://' + appAddr + '/api/workout/' + id
 		})
 		.then(result => {
 			workout = result.data;
+
+			// Create training
+			$http({
+				method: 'POST',
+				url: 'http://' + appAddr + '/api/training/create',
+				data: {
+					workoutId: parseInt(id),
+					volume: 1
+				}
+			})
+			.then(result => {
+				trainingId = result.data;
+			})
+			.catch(error => {
+				console.error(error);
+			});
 
 			$scope.workout = {
 				id: workout.id,
@@ -256,6 +274,21 @@
 						$scope.timer.start();
 						$scope.buttonText = 'Next';
 						self.state = 'ongoing';
+
+						$http({
+							method: 'PUT',
+							url: 'http://' + appAddr + '/api/training/start',
+							data: {
+								trainingId: trainingId
+							}
+						})
+						.then(result => {
+							console.log(result);
+						})
+						.catch(error => {
+							console.error(error);
+						});
+
 					} else if (self.state == 'ongoing') {
 						if ($scope.workout.nextExercice() == 1) {
 							$scope.timer.stop();
@@ -266,17 +299,19 @@
 						$scope.workout.updateExercice();
 					} else if (self.state == 'finished') {
 						$http({
-							method: 'POST',
-							url: 'http://' + appAddr + '/api/training/create',
+							method: 'PUT',
+							url: 'http://' + appAddr + '/api/training/finish',
 							data: {
-								workoutId: parseInt(id),
-								volume: 1
+								trainingId: trainingId
 							}
 						})
 						.then(result => {
+							console.log(result);
 							$window.location.href = '/user/profile';
 						})
-						.catch(error => console.error(error));
+						.catch(error => {
+							console.error(error);
+						});
 					}
 				}
 			};

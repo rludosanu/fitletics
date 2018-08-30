@@ -150,6 +150,12 @@ class TrainingRouter {
 
     /* Get all trainings */
     this.router.post('/read', this._app.controllers.training.read.bind(this));
+
+    /* Start a training */
+    this.router.put('/start', this._app.controllers.training.start.bind(this));
+
+    /* Finish a training */
+    this.router.put('/finish', this._app.controllers.training.finish.bind(this));
   }
 }
 

@@ -19,7 +19,17 @@ module.exports = class Training {
 			volume: {
 				type: Sequelize.INTEGER,
 				allowNull: false
-			}
+			},
+			startedAt: {
+				type: Sequelize.DATE,
+				allowNull: true,
+				defaultValue: null
+			},
+			finishedAt: {
+				type: Sequelize.DATE,
+				allowNull: true,
+				defaultValue: null
+			},
 		});
 	}
 }

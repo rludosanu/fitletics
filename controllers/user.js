@@ -305,7 +305,7 @@ module.exports = class User {
             .then(user => {
               if (!Object.keys(user._changed).length) {
                 // 304 Not Modified: User not modified
-                return res.status(304).json();
+                return res.status(304).json('Datas not modified');
               }
 
               // 200 OK: Success
@@ -407,7 +407,7 @@ module.exports = class User {
               .then(user => {
                 if (!Object.keys(user._changed).length) {
                   // 304 Not Modified: User not modified
-                  return res.status(304).json();
+                  return res.status(304).json('Datas not modified');
                 }
 
                 // 200 OK: Success
@@ -476,7 +476,7 @@ module.exports = class User {
         .then(user => {
           if (!Object.keys(user._changed).length) {
             // 304 Not Modified
-            return res.status(304).json();
+            return res.status(304).json('Datas not modified');
           }
 
           // Send activation confirmation by email
@@ -575,7 +575,7 @@ module.exports = class User {
           .then(user => {
             if (!Object.keys(user._changed).length) {
               // 304 Not Modified
-              return res.status(304).json();
+              return res.status(304).json('Datas not modified');
             }
 
             // 200 OK: Success
@@ -658,7 +658,7 @@ module.exports = class User {
           .then(user => {
             if (!Object.keys(user._changed).length) {
               // 304 Not Modified
-              return res.status(304).json();
+              return res.status(304).json('Datas not modified');
             }
 
             // Send password by email

@@ -91,6 +91,7 @@
 		var url = $location.absUrl().split('/');
 		var exerciseId = url[url.length - 3];
 		var exerciseVolume = url[url.length - 1];
+		var trainingId = 0;
 
 		/* Exercise informations */
 		$scope.exercise = {
@@ -158,22 +159,37 @@
 					$scope.timer.start();
 					$scope.buttonText = 'Finish';
 					self.state = 'ongoing';
-				} else if (self.state == 'ongoing') {
-					$scope.timer.stop();
 
-					/* Create a new training */
 					$http({
-						method: 'POST',
-						url: 'http://' + appAddr + '/api/training/create',
+						method: 'PUT',
+						url: 'http://' + appAddr + '/api/training/start',
 						data: {
-							exerciseId: parseInt(exerciseId),
-							volume: parseInt(exerciseVolume)
+							trainingId: trainingId
 						}
 					})
 					.then(result => {
+						console.log(result);
+					})
+					.catch(error => {
+						console.error(error);
+					});
+				} else if (self.state == 'ongoing') {
+					$scope.timer.stop();
+
+					$http({
+						method: 'PUT',
+						url: 'http://' + appAddr + '/api/training/finish',
+						data: {
+							trainingId: trainingId
+						}
+					})
+					.then(result => {
+						console.log(result);
 						$window.location.href = '/user/profile';
 					})
-					.catch(error => console.error(error));
+					.catch(error => {
+						console.error(error);
+					});
 				}
 			}
 		};
@@ -185,6 +201,22 @@
 		})
 		.then(result => {
 			$scope.exercise.name = result.data.name;
+
+			// Create training
+			$http({
+				method: 'POST',
+				url: 'http://' + appAddr + '/api/training/create',
+				data: {
+					exerciseId: parseInt(exerciseId),
+					volume: exerciseVolume
+				}
+			})
+			.then(result => {
+				trainingId = result.data;
+			})
+			.catch(error => {
+				console.error(error);
+			});
 		})
 		.catch(error => console.error(error));
 	});
